@@ -8,7 +8,9 @@ namespace CMPUT350 {
 
 struct Point2D {
     float x, y;
+
     Point2D(float x = 0, float y = 0) : x(x), y(y) {}
+
     Point2D operator+(const Point2D &other) const { return Point2D(x + other.x, y + other.y); }
     Point2D operator+(const float &scalar) const { return Point2D(x + scalar, y + scalar); }
     Point2D operator-(const Point2D &other) const { return Point2D(x - other.x, y - other.y); }
@@ -17,6 +19,7 @@ struct Point2D {
     Point2D operator/(const float &scalar) const { return Point2D(x / scalar, y / scalar); }
     float operator*(const Point2D &other) const { return x * other.x + y * other.y; }
     bool operator==(const Point2D &other) const { return x == other.x && y == other.y; }
+
     Point2D &operator+=(const Point2D &other) {
         x += other.x;
         y += other.y;
@@ -47,6 +50,7 @@ struct Point2D {
         y /= scalar;
         return *this;
     }
+
     float Dot(Point2D other) const { return x * other.x + y * other.y; }
     float Cross(Point2D other) const { return x * other.y - y * other.x; }
     float Distance(const Point2D &other) const { return hypotf(x - other.x, y - other.y); }
@@ -72,6 +76,7 @@ struct Line {
 
     Line(Point2D p1 = {0, 0}, Point2D p2 = {0, 0}) : p1(p1), p2(p2) {}
     Line(float x1, float y1, float x2, float y2) : p1(x1, y1), p2(x2, y2) {}
+
     float Length() const { return p1.Distance(p2); }
     Point2D ClosestPoint(const Point2D &p) const {
         Point2D diff = p2 - p1;
@@ -154,8 +159,8 @@ struct Rect {
     }
 };
 
-static std::ostream &operator<<(std::ostream &os, const Rect &l) {
-    // TODO: write this code
+static std::ostream &operator<<(std::ostream &os, const Rect &r) {
+    os << "(" << r.topLeft << ", " << r.width << ", " << r.height << ")";
     return os;
 }
 
