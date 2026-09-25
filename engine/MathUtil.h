@@ -53,6 +53,7 @@ struct Point2D {
     void Normalize() { *this /= this->Length(); }
     Point2D Normalized() const { return *this / this->Length(); }
     float Length() const { return hypot(x, y); }
+    float LengthSq() const { return x * x + y * y; }
     static float Dot(Point2D a, Point2D b) { return a.x * b.x + a.y * b.y; }
     static float Cross(Point2D a, Point2D b) { return a.x * b.y - a.y * b.x; }
 };
@@ -71,22 +72,25 @@ struct Line {
 
     Line(Point2D p1 = {0, 0}, Point2D p2 = {0, 0}) : p1(p1), p2(p2) {}
     Line(float x1, float y1, float x2, float y2) : p1(x1, y1), p2(x2, y2) {}
-    float Length() const {
-        // TODO: write this code
-        return 0;
-    }
+    float Length() const { return p1.Distance(p2); }
     Point2D ClosestPoint(const Point2D &p) const {
-        // TODO: write this code
-        return p;
+        Point2D diff = p2 - p1;
+        float t = (p - p1).Dot(diff) / diff.LengthSq();
+        t = fmax(t, fmin(t, 1));  // clamp
+        return p1 + diff * t;
+    }
+    bool IsOnLeftSide(const Point2D &p) const {
+        return (p1-p).Cross(p2-p) < 0;
     }
     bool Crosses(Line other, Point2D &crossingPoint) const {
-        // TODO: write this code
-        return false;
+        bool crossesForThis = IsOnLeftSide(other.p1) != IsOnLeftSide(other.p2);
+        bool crossesForOther = other.IsOnLeftSide(p1) != other.IsOnLeftSide(p2);
+        return crossesForThis && crossesForOther;
     }
 };
 
 static std::ostream &operator<<(std::ostream &os, const Line &l) {
-    // TODO: write this code
+    os << "(" << l.p1 << ", " << l.p2 << ")";
     return os;
 }
 
