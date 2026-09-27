@@ -25,8 +25,26 @@ GameEngine::~GameEngine() {
 void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
     // Add the gameObject to our "added" vector to tell the game to activate it
     addedGameObjects.push_back(gameObject);
+    mObjectSize += 1;
 }
 
+
+
+void GameEngine::cleanupDeadGameObjects() {
+    // Logic copied from Lab 2
+    // Apply a filter to remove dead GameObjects
+    std::vector<std::shared_ptr<GameObject>> filterResult;
+    // Use a vector swap filter to remove dead bullets
+    for (std::shared_ptr<GameObject> gObj: mGameObjects) {
+        if (gObj->IsAlive()) {
+            filterResult.push_back(gObj);
+        }
+        else {
+            mObjectSize -= 1;
+        }
+    }
+    mGameObjects.swap(filterResult);
+}
 
 
 bool GameEngine::ProcessEvents(GameContext *context) {
@@ -49,24 +67,49 @@ bool GameEngine::ProcessEvents(GameContext *context) {
             context->inputs.push_back(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)); // shoot
 
 		}
-        return false;
 	}
- }
-
-
- void GameEngine::cleanupDeadGameObjects() {
-    // Logic copied from Lab 2
-    // Apply a filter to remove dead GameObjects
-    std::vector<std::shared_ptr<GameObject>> filterResult;
-    // Use a vector swap filter to remove dead bullets
-    for (std::shared_ptr<GameObject> gObj: mGameObjects) {
-        if (gObj->IsAlive()) {
-            filterResult.push_back(gObj);
-        }
-    }
-    mGameObjects.swap(filterResult);
+    return false;
 }
 
+
+void GameEngine::processCollisions() {
+    // Checks if any gameObjects are colliding                                              TODO: more efficient collision detection?
+    for (int i = 0; i < mObjectSize; i++) {
+        for (int k = i + 1; k < mObjectSize; k++) {
+            std::shared_ptr<CollisionObject> gObj1 = std::dynamic_pointer_cast<CollisionObject>(mGameObjects[i]);
+            std::shared_ptr<CollisionObject> gObj2 = std::dynamic_pointer_cast<CollisionObject>(mGameObjects[k]);
+
+            if (gObj1 && gObj2) {
+                Rect g1Rect = gObj1->GetBounds();
+                Rect g2Rect = gObj2->GetBounds();
+
+                if (!(g1Rect.topLeft.x > g2Rect.bottomRight.x ||
+                    g1Rect.topLeft.y < g2Rect.bottomRight.y ||
+                    g1Rect.bottomRight.x < g2Rect.topLeft.x ||
+                    g1Rect.bottomRight.y > g2Rect.topLeft.y)) {
+                    gObj1->CollisionEnter(gObj2);
+                    gObj2->CollisionEnter(gObj1);
+                }
+            }
+        }
+    }
+}
+
+
+void GameEngine::renderObjects(GameContext *context) {
+    // Renders objects to the background.
+    for (std::shared_ptr<GameObject> gObj: mGameObjects) {
+        std::shared_ptr<GraphicsObject> gObj1 = std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        if (gObj1) {
+            if (gObj1->isBackground) {
+                gObj1->RenderBackground(context);
+            }
+            else {
+                gObj1->RenderForeground(context);
+            }
+        }
+    }
+}
 
 
 /**
@@ -77,6 +120,7 @@ bool GameEngine::ProcessEvents(GameContext *context) {
  */
 void GameEngine::Run() {
     GameContext *context;
+    mObjectSize = 0;
 
     while (true)  // window is open
     {
@@ -95,16 +139,20 @@ void GameEngine::Run() {
         for (std::shared_ptr<GameObject> gObj: mGameObjects) { gObj->Update(context); }
 
         // 4. Process collision events
+        processCollisions();
 
         // 5. Late updates
+        for (std::shared_ptr<GameObject> gObj: mGameObjects) { gObj->LateUpdate(context); }
 
         // Clear window
+        mWindow->clear(sf::Color::Black);
 
         // 6. Render background
-
         // 7. Render foreground
+        renderObjects(context);
 
         // Actually render to window
+        mWindow->display();
     }
 }
 

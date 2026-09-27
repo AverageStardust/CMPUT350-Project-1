@@ -8,11 +8,13 @@ class GameEngine;
 
 #include "EngineView.h"
 #include "GameObject.h"
+#include "CollisionObject.h"
 #include "GameContext.h"
 #include "MathUtil.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
+#include <typeinfo>
 
 namespace CMPUT350 {
 
@@ -32,6 +34,8 @@ public:
 
     bool ProcessEvents(GameContext *context);
     void cleanupDeadGameObjects();
+    void processCollisions();
+    void renderObjects(GameContext *context);
 
     void Run();
 
@@ -40,6 +44,8 @@ private:
     std::shared_ptr<sf::Font> mFont;
     std::vector<std::shared_ptr<GameObject>> mGameObjects;
     std::vector<std::shared_ptr<GameObject>> addedGameObjects; // Newly added objects that will be activated on the next frame
+
+    int mObjectSize;
 };
 
 }  // namespace CMPUT350
