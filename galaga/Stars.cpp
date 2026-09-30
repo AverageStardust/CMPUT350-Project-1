@@ -1,5 +1,6 @@
 #include "GameContext.h"
 #include "DrawContext.h"
+#include "MathUtil.h"
 #include "Stars.h"
 
 Stars::Stars(int numStars, CMPUT350::Rect bounds)

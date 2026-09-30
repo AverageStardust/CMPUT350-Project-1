@@ -74,7 +74,7 @@ void GameEngine::processCollisions() {
             std::shared_ptr<CollisionObject> gObj2 =
                 std::dynamic_pointer_cast<CollisionObject>(mGameObjects[k]);
 
-            if (gObj1 && gObj2) {
+            if (gObj1 != nullptr && gObj2 != nullptr) {
                 Rect g1Rect = gObj1->GetBounds();
                 Rect g2Rect = gObj2->GetBounds();
 
@@ -90,13 +90,19 @@ void GameEngine::processCollisions() {
 void GameEngine::renderObjects(GameContext *context) {
     // Renders objects to the background.
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> gObj1 = std::dynamic_pointer_cast<GraphicsObject>(gObj);
-        if (gObj1) {
-            if (gObj1->isBackground) {
-                gObj1->RenderBackground(context);
-            } else {
-                gObj1->RenderForeground(context);
-            }
+        std::shared_ptr<GraphicsObject> graphicObj =
+            std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        if (graphicObj != nullptr) {
+            graphicObj->RenderBackground(context);
+        }
+    }
+
+    // Renders objects to the foreground.
+    for (std::shared_ptr<GameObject> gObj : mGameObjects) {
+        std::shared_ptr<GraphicsObject> graphicObj =
+            std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        if (graphicObj != nullptr) {
+            graphicObj->RenderForeground(context);
         }
     }
 }

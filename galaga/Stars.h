@@ -2,6 +2,7 @@
 #define STARS_H
 
 #include "GraphicsObject.h"
+#include "MathUtil.h"
 #include <random>
 
 class Stars : public CMPUT350::GraphicsObject
