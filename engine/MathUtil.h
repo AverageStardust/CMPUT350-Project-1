@@ -4,6 +4,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "SFML/System/Vector2.hpp"
+
 namespace CMPUT350 {
 
 struct Point2D {
@@ -60,10 +62,27 @@ struct Point2D {
     float Distance(const Point2D &other) const { return hypotf(x - other.x, y - other.y); }
     void Normalize() { *this /= this->Length(); }
     Point2D Normalized() const { return *this / this->Length(); }
+    void Rotate(float thetaRadians) {
+        float sinTheta = sinf(thetaRadians);
+        float cosTheta = cosf(thetaRadians);
+        float tempX = x;
+        x = x * cosTheta - y * sinTheta;
+        y = tempX * sinTheta + y * cosTheta;
+    }
+    Point2D Rotated(float thetaRadians) const {
+        float sinTheta = sinf(thetaRadians);
+        float cosTheta = cosf(thetaRadians);
+        return Point2D(x * cosTheta - y * sinTheta, x * sinTheta + y * cosTheta);
+    }
+    Point2D Perpendicular() const { return Point2D(-y, x); }
     float Length() const { return hypot(x, y); }
     float LengthSq() const { return x * x + y * y; }
     static float Dot(Point2D a, Point2D b) { return a.x * b.x + a.y * b.y; }
     static float Cross(Point2D a, Point2D b) { return a.x * b.y - a.y * b.x; }
+
+private:
+    friend class DrawContext;
+    sf::Vector2f AsSfmlVector() const { return sf::Vector2f(x, y); }
 };
 
 static std::ostream &operator<<(std::ostream &os, const Point2D &p) {

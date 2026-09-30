@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "MathUtil.h"
+#include "SFML/Graphics/Color.hpp"
 #include <SFML/Graphics.hpp>
 
 namespace CMPUT350 {
@@ -11,6 +12,12 @@ namespace CMPUT350 {
 struct RGBColor {
     uint8_t r, g, b;
     RGBColor(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
+
+    private:
+        friend class DrawContext;
+        sf::Color const AsSfmlColor() {
+            return sf::Color(r, g, b);
+        }
 };
 
 namespace Colors {

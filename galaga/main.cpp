@@ -1,5 +1,7 @@
 #include <random>
+#include "DrawContext.h"
 #include "GameEngine.h"
+#include "MathUtil.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Stars.h"
