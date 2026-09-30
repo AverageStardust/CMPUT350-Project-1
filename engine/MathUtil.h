@@ -121,11 +121,9 @@ struct Rect {
     // Creates bounding box around p1 and p2 with positive width/height
     Rect(Point2D p1, Point2D p2) : topLeft(p1.Min(p2)), bottomRight(p1.Max(p2)) {}
     Rect(Point2D center, float radius)
-        : topLeft(center.x - radius),
-          bottomRight(center.x + radius) {}
+        : topLeft(center.x - radius), bottomRight(center.x + radius) {}
     Rect(Circle circle)
-        : topLeft(circle.center - circle.radius),
-          bottomRight(circle.center + circle.radius) {}
+        : topLeft(circle.center - circle.radius), bottomRight(circle.center + circle.radius) {}
 
     Rect operator|(const Point2D &other) const {
         Rect result;
@@ -197,6 +195,18 @@ struct Rect {
         return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
     }
     bool IsEmpty() const { return !(topLeft < bottomRight); }
+    float Width() const {
+        if (IsEmpty()) return 0;
+        return bottomRight.x - topLeft.x;
+    }
+    float Height() const {
+        if (IsEmpty()) return 0;
+        return bottomRight.y - topLeft.y;
+    }
+    Point2D Size() const {
+        if (IsEmpty()) return Point2D();
+        return bottomRight - topLeft;
+    }
 };
 
 static std::ostream &operator<<(std::ostream &os, const Rect &r) {

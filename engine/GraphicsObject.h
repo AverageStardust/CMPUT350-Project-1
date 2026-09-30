@@ -9,11 +9,7 @@ class GameContext;
 
 class GraphicsObject : public GameObject {
 public:
-    GraphicsObject(bool background) : isBackground(background) {
-        if (background != true) {
-            isBackground = false;
-        }
-    };
+    GraphicsObject(bool background = false) : isBackground(background) {};
 
     virtual void RenderBackground(GameContext *context);
     virtual void RenderForeground(GameContext *context);

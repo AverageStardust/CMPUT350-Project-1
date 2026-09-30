@@ -1,6 +1,8 @@
 #include "Bullet.h"
+#include "GraphicsObject.h"
 
-Bullet::Bullet(CMPUT350::Point2D location, CMPUT350::Point2D heading, bool player)
+Bullet::Bullet(CMPUT350::Point2D location, CMPUT350::Point2D heading, bool player) :
+location(location), heading(heading), isFromPlayer(player)
 {
 }
 

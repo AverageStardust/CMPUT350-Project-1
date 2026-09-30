@@ -5,8 +5,8 @@
 Stars::Stars(int numStars, CMPUT350::Rect bounds)
     : mBounds(bounds), gen(rd())
 {
-    std::uniform_int_distribution<int> mXRand(bounds.topLeft.x, bounds.topLeft.x + bounds.width);
-    std::uniform_int_distribution<int> mYRand(bounds.topLeft.y, bounds.topLeft.y + bounds.height);
+    std::uniform_int_distribution<int> mXRand(bounds.topLeft.x, bounds.topLeft.x + bounds.Width());
+    std::uniform_int_distribution<int> mYRand(bounds.topLeft.y, bounds.topLeft.y + bounds.Height());
     // Generate random star positions within the bounds
     for (int x = 0; x < numStars; x++)
     {
@@ -28,7 +28,7 @@ void Stars::RenderBackground(CMPUT350::GameContext* context)
         if ((curr + skip / 5) % (mStarPositions.size() / 20) != 0)
             context->ScreenContext->DrawCircle(star, 1.0f, c[(curr) % 4]);
         star.y += 3;
-        if (star.y > mBounds.topLeft.y + mBounds.height)
-            star.y -= mBounds.height;
+        if (star.y > mBounds.topLeft.y + mBounds.Height())
+            star.y -= mBounds.Height();
     }
 }
