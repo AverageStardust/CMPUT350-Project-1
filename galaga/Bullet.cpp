@@ -1,4 +1,5 @@
 #include "Bullet.h"
+#include "DrawContext.h"
 #include "GraphicsObject.h"
 
 Bullet::Bullet(CMPUT350::Point2D location, CMPUT350::Point2D heading, bool player) :
@@ -24,16 +25,10 @@ void Bullet::LateUpdate(CMPUT350::GameContext* context)
 {
 }
 
-bool Bullet::HandleKeyEvent(CMPUT350::GameContext* context, char key)
-{
-}
 
 void Bullet::RenderBackground(CMPUT350::GameContext* context)
 {
-}
-
-void Bullet::RenderForeground(CMPUT350::GameContext* context)
-{
+    context->ScreenContext->DrawCircle(location, 10, CMPUT350::Colors::red);
 }
 
 void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject>& obj)

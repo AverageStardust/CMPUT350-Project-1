@@ -52,13 +52,16 @@ bool GameEngine::ProcessEvents(GameContext *context) {
             mWindow->close();
             return true;
         } else if (const auto *resize = event->getIf<sf::Event::Resized>()) {
-            mWindow->setView(
-                sf::View(sf::FloatRect({0.f, 0.f}, {static_cast<float>(resize->size.x),
-                                                    static_cast<float>(resize->size.y)})));
-        } else if (const auto *keyPressed = event->getIf<sf::Event::TextEntered>()) {
-            context->inputs[0] = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A);  // move left
-            context->inputs[1] = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D);  // move right
-            context->inputs[2] = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);  // shoot
+            mWindow->setView(sf::View(
+                sf::FloatRect({0.f, 0.f}, {float(resize->size.x), float(resize->size.y)})));
+        } else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+            for (std::shared_ptr<GameObject> gObj : mGameObjects) {
+                gObj->HandleKeyEvent(context, char(keyPressed->scancode), true);
+            }
+        } else if (const auto *keyPressed = event->getIf<sf::Event::KeyReleased>()) {
+            for (std::shared_ptr<GameObject> gObj : mGameObjects) {
+                gObj->HandleKeyEvent(context, char(keyPressed->scancode), false);
+            }
         }
     }
 

@@ -1,11 +1,14 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <forward_list>
+#include "Bullet.h"
 #include "CollisionObject.h"
 #include "MathUtil.h"
 
 class Player : public CMPUT350::CollisionObject
 {
+    static const int MAX_PLAYER_BULLETS = 2;
 public:
     Player(CMPUT350::Point2D loc);
 
@@ -13,12 +16,11 @@ public:
     void Initialize(CMPUT350::GameContext* context) override;
     void Update(CMPUT350::GameContext* context) override;
     void LateUpdate(CMPUT350::GameContext* context) override;
-    bool HandleKeyEvent(CMPUT350::GameContext* context, char key) override;
+    void HandleKeyEvent(CMPUT350::GameContext* context, int key, bool isPressed) override;
     bool IsAlive() const override;
     void Kill() override;
 
     // Graphics Object Functions
-    void RenderBackground(CMPUT350::GameContext* context) override;
     void RenderForeground(CMPUT350::GameContext* context) override;
 
 
@@ -28,6 +30,9 @@ public:
 
 private:
     CMPUT350::Point2D location;
+    std::forward_list<std::weak_ptr<Bullet>> bullets;
+    bool isLeftPressed = false;
+    bool isRightPressed = false;
 };
 
 #endif

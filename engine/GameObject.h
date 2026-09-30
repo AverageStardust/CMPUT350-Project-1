@@ -12,7 +12,7 @@ public:
     virtual void Update(GameContext *context);
     virtual void LateUpdate(GameContext *context);
     virtual void RenderUI(GameContext *context);
-    virtual bool HandleKeyEvent(GameContext *context, char key);
+    virtual void HandleKeyEvent(GameContext *context, int key, bool isPressed);
     virtual bool IsAlive() const;
     virtual void Kill();
 };
