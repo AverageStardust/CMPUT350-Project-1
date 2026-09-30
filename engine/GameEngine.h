@@ -44,8 +44,6 @@ private:
     std::shared_ptr<sf::Font> mFont;
     std::vector<std::shared_ptr<GameObject>> mGameObjects;
     std::vector<std::shared_ptr<GameObject>> addedGameObjects; // Newly added objects that will be activated on the next frame
-
-    int mObjectSize;
 };
 
 }  // namespace CMPUT350

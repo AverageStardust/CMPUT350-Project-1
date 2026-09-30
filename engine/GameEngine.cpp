@@ -1,7 +1,9 @@
 #include "GameEngine.h"
 
+#include "DrawContext.h"
 #include "EngineView.h"
 #include "GameContext.h"
+#include "MathUtil.h"
 
 /// @brief
 namespace CMPUT350 {
@@ -9,9 +11,9 @@ namespace CMPUT350 {
 
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string &name) {
     // Sample font loading code
-    if (false && !mFont->openFromMemory(&_font, _font_len)) {
-        fprintf(stderr, "WARNING: Font did not load.\n");
-    }
+    // if (!mFont->openFromMemory(&_font, _font_len)) {
+    //     fprintf(stderr, "WARNING: Font did not load.\n");
+    // }
     // Setup window
     std::shared_ptr<sf::RenderWindow> windowPointer =
         std::make_shared<sf::RenderWindow>(sf::VideoMode(sf::Vector2u(width, height)), name);
@@ -27,7 +29,6 @@ GameEngine::~GameEngine() {
 void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
     // Add the gameObject to our "added" vector to tell the game to activate it
     addedGameObjects.push_back(gameObject);
-    mObjectSize += 1;
 }
 
 void GameEngine::cleanupDeadGameObjects() {
@@ -38,8 +39,6 @@ void GameEngine::cleanupDeadGameObjects() {
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
         if (gObj->IsAlive()) {
             filterResult.push_back(gObj);
-        } else {
-            mObjectSize -= 1;
         }
     }
     mGameObjects.swap(filterResult);
@@ -67,10 +66,9 @@ bool GameEngine::ProcessEvents(GameContext *context) {
 }
 
 void GameEngine::processCollisions() {
-    // Checks if any gameObjects are colliding                                              TODO:
-    // more efficient collision detection?
-    for (int i = 0; i < mObjectSize; i++) {
-        for (int k = i + 1; k < mObjectSize; k++) {
+    // TODO: more efficient collision detection?
+    for (int i = 0; i < mGameObjects.size(); i++) {
+        for (int k = i + 1; k < mGameObjects.size(); k++) {
             std::shared_ptr<CollisionObject> gObj1 =
                 std::dynamic_pointer_cast<CollisionObject>(mGameObjects[i]);
             std::shared_ptr<CollisionObject> gObj2 =
@@ -80,10 +78,7 @@ void GameEngine::processCollisions() {
                 Rect g1Rect = gObj1->GetBounds();
                 Rect g2Rect = gObj2->GetBounds();
 
-                if (!(g1Rect.topLeft.x > g2Rect.bottomRight.x ||
-                      g1Rect.topLeft.y < g2Rect.bottomRight.y ||
-                      g1Rect.bottomRight.x < g2Rect.topLeft.x ||
-                      g1Rect.bottomRight.y > g2Rect.topLeft.y)) {
+                if (g1Rect.IsIntersecting(g2Rect)) {
                     gObj1->CollisionEnter(gObj2);
                     gObj2->CollisionEnter(gObj1);
                 }
@@ -114,7 +109,6 @@ void GameEngine::renderObjects(GameContext *context) {
  */
 void GameEngine::Run() {
     GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont));
-    mObjectSize = 0;
 
     while (true)  // window is open
     {

@@ -210,6 +210,9 @@ struct Rect {
         result.bottomRight = topLeft - inset;
         return result;
     }
+    bool IsIntersecting(const Rect &p) const {
+        return !(*this & p).IsEmpty();
+    }
     bool IsInside(const Point2D &p) const {
         return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
     }

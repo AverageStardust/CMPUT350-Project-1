@@ -81,8 +81,7 @@ public:
 
     const CMPUT350::Rect& GetBounds() override
     {
-        static CMPUT350::Rect bounds({0, 0}, 0, 0); // Initialize with dummy values
-        bounds = CMPUT350::Rect(mLoc - mRadius, 2 * mRadius, 2 * mRadius);
+        static CMPUT350::Rect bounds(mLoc - mRadius, mLoc + mRadius); // Initialize with dummy values
         return bounds;
     }
 
