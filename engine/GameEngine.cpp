@@ -46,6 +46,7 @@ void GameEngine::cleanupDeadGameObjects() {
 
 bool GameEngine::ProcessEvents(GameContext *context) {
     // Returns true if the window has been closed
+    // Also checks for window resizing and key presses
 
     while (const std::optional event = mWindow->pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
@@ -69,7 +70,7 @@ bool GameEngine::ProcessEvents(GameContext *context) {
 }
 
 void GameEngine::processCollisions() {
-    // TODO: more efficient collision detection?
+    // Check each object against each other object and call CollisionEnter on any objects that intersect
     for (int i = 0; i < mGameObjects.size(); i++) {
         for (int k = i + 1; k < mGameObjects.size(); k++) {
             std::shared_ptr<CollisionObject> gObj1 =
@@ -91,7 +92,8 @@ void GameEngine::processCollisions() {
 }
 
 void GameEngine::renderObjects(GameContext *context) {
-    // Renders objects to the background.
+    // Iterate over all GameObjects and render GraphicsObjects to the screen
+    // Render objects to the background
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
         std::shared_ptr<GraphicsObject> graphicObj =
             std::dynamic_pointer_cast<GraphicsObject>(gObj);
@@ -100,7 +102,7 @@ void GameEngine::renderObjects(GameContext *context) {
         }
     }
 
-    // Renders objects to the foreground.
+    // Render objects to the foreground
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
         std::shared_ptr<GraphicsObject> graphicObj =
             std::dynamic_pointer_cast<GraphicsObject>(gObj);
