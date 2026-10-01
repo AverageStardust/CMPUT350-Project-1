@@ -2,6 +2,9 @@
 #include "DrawContext.h"
 #include "GraphicsObject.h"
 
+#include "Player.h"
+#include "Enemy.h"
+
 Bullet::Bullet(CMPUT350::Point2D location, CMPUT350::Point2D heading, bool player) :
 location(location), heading(heading), isFromPlayer(player)
 {
@@ -24,6 +27,10 @@ void Bullet::Update(CMPUT350::GameContext* context)
     CMPUT350::Point2D diff = heading - location;
     location = heading;
     heading = location + diff;
+
+    if (location.y < 0 || location.y > 1024) {
+        Kill();
+    }
 }
 
 void Bullet::LateUpdate(CMPUT350::GameContext* context)
@@ -38,10 +45,16 @@ void Bullet::RenderBackground(CMPUT350::GameContext* context)
 
 void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject>& obj)
 {
+    if ((typeid(*obj) == typeid(Enemy) && IsPlayerBullet()) ||
+            typeid(*obj) == typeid(Player) && !IsPlayerBullet()) {
+        obj->Kill();
+        Kill();
+    }
 }
 
 void Bullet::Kill()
 {
+    alive = false;
 }
 
 bool Bullet::IsAlive() const

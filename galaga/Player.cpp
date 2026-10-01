@@ -9,7 +9,10 @@
 
 Player::Player(CMPUT350::Point2D location) : location(location) {}
 
-void Player::Initialize(CMPUT350::GameContext *context) {}
+void Player::Initialize(CMPUT350::GameContext *context) {
+    boundWidth = 40.0f;
+    boundHeight = 40.0f;
+}
 
 void Player::Update(CMPUT350::GameContext *context) {
     if (isLeftPressed && !isRightPressed) {
@@ -36,7 +39,7 @@ void Player::HandleKeyEvent(CMPUT350::GameContext *context, int key, bool isPres
 
                 if (size < 2) {
                     std::shared_ptr<Bullet> bullet =
-                        std::make_shared<Bullet>(location, CMPUT350::Point2D(), true);
+                        std::make_shared<Bullet>(location, location + CMPUT350::Point2D(0, -20), true);
                     context->mEngineView->AddGameObject(bullet);
                     bullets.push_front(bullet);
                 }
@@ -69,15 +72,15 @@ void Player::RenderForeground(CMPUT350::GameContext *context) {
 
 void Player::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) {}
 
-void Player::Kill() {}
+void Player::Kill() {
+    alive = false;
+}
 
 bool Player::IsAlive() const {
-    // TODO: Update code
-    return true;
+    return alive;
 }
 
 const CMPUT350::Rect &Player::GetBounds() {
-    // TODO: Update code
-    static CMPUT350::Rect sBounds(0, 0, 0, 0);
+    static CMPUT350::Rect sBounds(location - CMPUT350::Point2D(boundWidth/2, boundHeight/2), boundWidth, boundHeight);
     return sBounds;
 }

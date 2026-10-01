@@ -33,6 +33,10 @@ private:
     std::forward_list<std::weak_ptr<Bullet>> bullets;
     bool isLeftPressed = false;
     bool isRightPressed = false;
+
+    float boundWidth;
+    float boundHeight;
+    bool alive = true;
 };
 
 #endif
