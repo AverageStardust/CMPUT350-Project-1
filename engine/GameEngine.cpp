@@ -127,6 +127,7 @@ void GameEngine::Run() {
         // 1. Activate and initialize any objects added during the last frame
         for (std::shared_ptr<GameObject> gObj : addedGameObjects) {
             mGameObjects.push_back(gObj);
+            gObj->Initialize(context);
         }
         addedGameObjects.clear();
 

@@ -28,9 +28,10 @@ public:
 private:
     // Private variablesS
     CMPUT350::Point2D location;
+    
     float boundWidth;
     float boundHeight;
-    bool alive;
+    bool alive = true;
 };
 
 

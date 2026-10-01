@@ -2,18 +2,15 @@
 #include "Bullet.h"
 #include "DrawContext.h"
 
-Enemy::Enemy(CMPUT350::Point2D loc)
+Enemy::Enemy(CMPUT350::Point2D loc) : location(loc)
 {
-    location = loc;
-    alive = true;
-
-    // Manually setting bound size, change if desired
-    boundWidth = 50.0f;
-    boundHeight = 50.0f;
 }
 
 void Enemy::Initialize(CMPUT350::GameContext* context)
 {
+    // Manually setting bound size, change if desired
+    boundWidth = 50.0f;
+    boundHeight = 50.0f;
 }
 
 void Enemy::Update(CMPUT350::GameContext* context)
