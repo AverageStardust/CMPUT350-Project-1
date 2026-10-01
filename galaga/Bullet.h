@@ -28,5 +28,9 @@ private:
     CMPUT350::Point2D location;
     CMPUT350::Point2D heading;
     bool isFromPlayer;
+
+    float boundWidth;
+    float boundHeight;
+    bool alive = true;
 };
 #endif // BULLET_H

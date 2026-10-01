@@ -9,16 +9,21 @@ location(location), heading(heading), isFromPlayer(player)
 
 bool Bullet::IsPlayerBullet()
 {
-    // TODO: Update
-    return true;
+    return isFromPlayer;
 }
 
 void Bullet::Initialize(CMPUT350::GameContext* context)
 {
+    // Manually setting bound size, change if desired
+    boundWidth = 2.0f;
+    boundHeight = 2.0f;
 }
 
 void Bullet::Update(CMPUT350::GameContext* context)
 {
+    CMPUT350::Point2D diff = heading - location;
+    location = heading;
+    heading = location + diff;
 }
 
 void Bullet::LateUpdate(CMPUT350::GameContext* context)
@@ -41,13 +46,18 @@ void Bullet::Kill()
 
 bool Bullet::IsAlive() const
 {
-    // TODO: Update code
-    return true;
+    return alive;
 }
 
 const CMPUT350::Rect& Bullet::GetBounds()
 {
-    // TODO: Update code
-    static CMPUT350::Rect sBounds(0, 0, 0, 0);
-    return sBounds;
+    static CMPUT350::Point2D diff = heading.y - location.y;
+    if (location.y > heading.y) {
+        static CMPUT350::Rect sBounds(location.x - boundWidth/2, heading.y - boundHeight/2, boundWidth, boundHeight - diff.y);
+        return sBounds;
+    }
+    else {
+        static CMPUT350::Rect sBounds(location.x - boundWidth/2, location.y - boundHeight/2, boundWidth, boundHeight + diff.y);
+        return sBounds;
+    }
 }
