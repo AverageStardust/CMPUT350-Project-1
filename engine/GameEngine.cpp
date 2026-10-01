@@ -1,5 +1,7 @@
 #include "GameEngine.h"
 
+#include <vector>
+
 #include "DrawContext.h"
 #include "EngineView.h"
 #include "GameContext.h"
@@ -70,21 +72,25 @@ bool GameEngine::ProcessEvents(GameContext *context) {
 
 void GameEngine::processCollisions() {
     // TODO: more efficient collision detection?
+
+    std::vector<std::shared_ptr<CollisionObject>> colliders;
+    std::vector<CMPUT350::Rect> bounds;
+
     for (int i = 0; i < mGameObjects.size(); i++) {
-        for (int k = i + 1; k < mGameObjects.size(); k++) {
-            std::shared_ptr<CollisionObject> gObj1 =
-                std::dynamic_pointer_cast<CollisionObject>(mGameObjects[i]);
-            std::shared_ptr<CollisionObject> gObj2 =
-                std::dynamic_pointer_cast<CollisionObject>(mGameObjects[k]);
+        std::shared_ptr<CollisionObject> collider =
+            std::dynamic_pointer_cast<CollisionObject>(mGameObjects[i]);
 
-            if (gObj1 != nullptr && gObj2 != nullptr) {
-                CMPUT350::Rect g1Rect = gObj1->GetBounds();
-                CMPUT350::Rect g2Rect = gObj2->GetBounds();
+        if (collider != nullptr) {
+            colliders.push_back(collider);
+            bounds.push_back(collider->GetBounds());
+        }
+    }
 
-                if (g1Rect.IsIntersecting(g2Rect)) {
-                    gObj1->CollisionEnter(gObj2);
-                    gObj2->CollisionEnter(gObj1);
-                }
+    for (int i = 0; i < colliders.size(); i++) {
+        for (int j = i + 1; j < colliders.size(); j++) {
+            if (bounds[i].IsIntersecting(bounds[j])) {
+                colliders[i]->CollisionEnter(colliders[j]);
+                colliders[j]->CollisionEnter(colliders[i]);
             }
         }
     }

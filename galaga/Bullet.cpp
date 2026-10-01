@@ -13,8 +13,8 @@ bool Bullet::IsPlayerBullet() { return isFromPlayer; }
 
 void Bullet::Initialize(CMPUT350::GameContext *context) {
     // Manually setting bound size, change if desired
-    boundWidth = 2.0f;
-    boundHeight = 2.0f;
+    boundWidth = 4.0f;
+    boundHeight = 4.0f;
 }
 
 void Bullet::Update(CMPUT350::GameContext *context) {
@@ -28,7 +28,7 @@ void Bullet::Update(CMPUT350::GameContext *context) {
 void Bullet::LateUpdate(CMPUT350::GameContext *context) {}
 
 void Bullet::RenderBackground(CMPUT350::GameContext *context) {
-    context->ScreenContext->DrawCircle(location, 10, CMPUT350::Colors::red);
+    context->ScreenContext->DrawLine(location, location - heading, 4, CMPUT350::Colors::red);
 }
 
 void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) {
