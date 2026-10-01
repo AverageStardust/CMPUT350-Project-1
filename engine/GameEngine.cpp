@@ -78,8 +78,8 @@ void GameEngine::processCollisions() {
                 std::dynamic_pointer_cast<CollisionObject>(mGameObjects[k]);
 
             if (gObj1 != nullptr && gObj2 != nullptr) {
-                Rect g1Rect = gObj1->GetBounds();
-                Rect g2Rect = gObj2->GetBounds();
+                CMPUT350::Rect g1Rect = gObj1->GetBounds();
+                CMPUT350::Rect g2Rect = gObj2->GetBounds();
 
                 if (g1Rect.IsIntersecting(g2Rect)) {
                     gObj1->CollisionEnter(gObj2);

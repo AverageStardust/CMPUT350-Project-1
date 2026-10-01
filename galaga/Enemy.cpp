@@ -58,6 +58,6 @@ bool Enemy::IsAlive() const
 
 const CMPUT350::Rect& Enemy::GetBounds()
 {
-    static CMPUT350::Rect sBounds(location - CMPUT350::Point2D(boundWidth/2, boundHeight/2), boundWidth, boundHeight);
+    static CMPUT350::Rect sBounds(location.y - boundHeight/2, location.x - boundWidth/2, boundWidth, boundHeight);
     return sBounds;
 }

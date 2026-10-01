@@ -41,6 +41,8 @@ void Bullet::LateUpdate(CMPUT350::GameContext* context)
 void Bullet::RenderBackground(CMPUT350::GameContext* context)
 {
     context->ScreenContext->DrawCircle(location, 10, CMPUT350::Colors::red);
+    CMPUT350::Rect yBounds(location.y - boundWidth/2, location.x - boundHeight/2, boundWidth, boundHeight + (location - heading).y);
+    context->ScreenContext->DrawRect(yBounds, CMPUT350::Colors::white);
 }
 
 void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject>& obj)
@@ -64,13 +66,13 @@ bool Bullet::IsAlive() const
 
 const CMPUT350::Rect& Bullet::GetBounds()
 {
-    static CMPUT350::Point2D diff = heading.y - location.y;
+    CMPUT350::Point2D diff = heading - location;
     if (location.y > heading.y) {
-        static CMPUT350::Rect sBounds(location.x - boundWidth/2, heading.y - boundHeight/2, boundWidth, boundHeight - diff.y);
-        return sBounds;
+        static CMPUT350::Rect downBounds(location.y - boundWidth/2, heading.x - boundHeight/2, boundWidth, boundHeight - diff.y);
+        return downBounds;
     }
     else {
-        static CMPUT350::Rect sBounds(location.x - boundWidth/2, location.y - boundHeight/2, boundWidth, boundHeight + diff.y);
-        return sBounds;
+        static CMPUT350::Rect upBounds(location.y - boundWidth/2, location.x - boundHeight/2, boundWidth, boundHeight + diff.y);
+        return upBounds;
     }
 }
