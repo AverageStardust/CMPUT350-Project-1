@@ -134,7 +134,7 @@ struct Rect {
     Point2D bottomRight;
 
     Rect(float left, float top, float width, float height)
-        : topLeft(Point2D(top, left)), bottomRight(Point2D(top + width, left + height)) {}
+        : topLeft(Point2D(left, top)), bottomRight(Point2D(left + width, top + height)) {}
     Rect(Point2D tl = {0, 0}, int w = 0, int h = 0)
         : topLeft(tl), bottomRight(tl + Point2D(w, h)) {}
     // Creates bounding box around p1 and p2 with positive width/height

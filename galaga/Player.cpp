@@ -39,7 +39,7 @@ void Player::HandleKeyEvent(CMPUT350::GameContext *context, int key, bool isPres
 
                 if (size < 2) {
                     std::shared_ptr<Bullet> bullet =
-                        std::make_shared<Bullet>(location, location + CMPUT350::Point2D(0, -20), true);
+                        std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -20), true);
                     context->mEngineView->AddGameObject(bullet);
                     bullets.push_front(bullet);
                 }
