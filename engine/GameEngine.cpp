@@ -167,6 +167,9 @@ void GameEngine::Run() {
 
         // Actually render to window
         mWindow->display();
+
+        delete context->ScreenContext;
+        delete context;
     }
 }
 
