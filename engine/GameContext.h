@@ -1,11 +1,9 @@
 #ifndef GAMECONTEXT_H
 #define GAMECONTEXT_H
 
-#include <vector>
 
 #include "DrawContext.h"
 #include "EngineView.h"
-#include "GameObject.h"
 
 namespace CMPUT350 {
 

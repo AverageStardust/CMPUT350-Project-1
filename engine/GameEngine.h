@@ -6,15 +6,15 @@ namespace CMPUT350 {
 class GameEngine;
 }
 
-#include "EngineView.h"
-#include "GameObject.h"
-#include "CollisionObject.h"
-#include "GameContext.h"
-#include "MathUtil.h"
-#include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
-#include <typeinfo>
+
+#include "CollisionObject.h"
+#include "EngineView.h"
+#include "FontData.h"
+#include "GameContext.h"
+#include "GameObject.h"
+#include <SFML/Graphics.hpp>
 
 namespace CMPUT350 {
 
@@ -22,13 +22,13 @@ class DrawContext;
 
 class GameEngine : public EngineView {
 public:
-    GameEngine(unsigned int width, unsigned int height, const std::string& name);
+    GameEngine(unsigned int width, unsigned int height, const std::string &name);
     ~GameEngine();
 
-    GameEngine(const GameEngine&) = delete;             // Prevent copy-construction
-    GameEngine(GameEngine&&) = delete;                  // Prevent move-construction
-    GameEngine& operator=(const GameEngine&) = delete;  // Prevent assignment
-    GameEngine& operator=(GameEngine&&) = delete;       // Prevent move-assignment
+    GameEngine(const GameEngine &) = delete;             // Prevent copy-construction
+    GameEngine(GameEngine &&) = delete;                  // Prevent move-construction
+    GameEngine &operator=(const GameEngine &) = delete;  // Prevent assignment
+    GameEngine &operator=(GameEngine &&) = delete;       // Prevent move-assignment
 
     void AddGameObject(std::shared_ptr<GameObject> gameObject) override;
 
@@ -43,7 +43,8 @@ private:
     std::shared_ptr<sf::RenderWindow> mWindow;
     std::shared_ptr<sf::Font> mFont;
     std::vector<std::shared_ptr<GameObject>> mGameObjects;
-    std::vector<std::shared_ptr<GameObject>> addedGameObjects; // Newly added objects that will be activated on the next frame
+    std::vector<std::shared_ptr<GameObject>>
+        addedGameObjects;  // Newly added objects that will be activated on the next frame
 };
 
 }  // namespace CMPUT350

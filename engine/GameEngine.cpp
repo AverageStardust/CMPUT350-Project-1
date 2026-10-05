@@ -1,21 +1,17 @@
 #include "GameEngine.h"
-
-#include <vector>
-
-#include "DrawContext.h"
-#include "EngineView.h"
-#include "GameContext.h"
-#include "MathUtil.h"
+#include <memory>
+#include "SFML/Graphics/Font.hpp"
 
 /// @brief
 namespace CMPUT350 {
-#include "FontData.h"
 
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string &name) {
-    // Sample font loading code
-    // if (!mFont->openFromMemory(&_font, _font_len)) {
-    //     fprintf(stderr, "WARNING: Font did not load.\n");
-    // }
+    // load font
+    mFont = std::make_shared<sf::Font>(sf::Font());
+    if (!mFont->openFromMemory(_font, _font_len)) {
+        fprintf(stderr, "WARNING: Font did not load.\n");
+    }
+
     // Setup window
     std::shared_ptr<sf::RenderWindow> windowPointer =
         std::make_shared<sf::RenderWindow>(sf::VideoMode(sf::Vector2u(width, height)), name);
@@ -167,10 +163,10 @@ void GameEngine::Run() {
 
         // Actually render to window
         mWindow->display();
-
-        delete context->ScreenContext;
-        delete context;
     }
+
+    delete context->ScreenContext;
+    delete context;
 }
 
 }  // namespace CMPUT350

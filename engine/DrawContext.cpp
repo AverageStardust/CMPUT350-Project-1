@@ -4,18 +4,30 @@
 #include "SFML/Graphics/CircleShape.hpp"
 #include "SFML/Graphics/Color.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
+#include "SFML/Graphics/Text.hpp"
 
 namespace CMPUT350 {
 
 DrawContext::DrawContext(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<sf::Font> font)
     : mWindow(window), mFont(font) {}
 
-void DrawContext::DrawCenteredText(const std::string &text, int pixelSize, Point2D p, RGBColor c) {
-    // TODO
+void DrawContext::DrawCenteredText(const std::string &str, int pixelSize, Point2D p, RGBColor c) {
+    sf::Text text(*mFont, str, pixelSize);
+
+    text.setFillColor(c.AsSfmlColor());
+    text.setPosition(p.AsSfmlVector());
+    text.setLineAlignment(sf::Text::LineAlignment::Center);
+
+    mWindow->draw(text);
 }
 
-void DrawContext::DrawText(const std::string &text, int pixelSize, Point2D p, RGBColor c) {
-    // TODO
+void DrawContext::DrawText(const std::string &str, int pixelSize, Point2D p, RGBColor c) {
+    sf::Text text(*mFont, str, pixelSize);
+
+    text.setFillColor(c.AsSfmlColor());
+    text.setPosition(p.AsSfmlVector());
+
+    mWindow->draw(text);
 }
 
 void DrawContext::DrawCircle(Point2D p, float radius, RGBColor c) {
