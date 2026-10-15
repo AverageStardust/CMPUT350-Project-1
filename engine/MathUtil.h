@@ -271,18 +271,20 @@ struct Matrix2 {
 
 // Augmented 2x2 matrix representing 2d transformations
 struct Transform2D {
+    Matrix2 basis;
+    Point2D origin;
+
+    Transform2D(Matrix2 basis = {}, Point2D origin = {}) : basis{basis}, origin{origin} {}
+
     static Transform2D Rotation(float angle) {
         float cosAngle = std::cos(angle);
         float sinAngle = std::sin(angle);
-        return Transform2D(Matrix2(cosAngle, -sinAngle, sinAngle, cosAngle), {0.0, 0.0});
+        return Transform2D(Matrix2(cosAngle, -sinAngle, sinAngle, cosAngle), {});
     }
-    static Transform2D Translation(Point2D offset) { return Transform2D({0.0, 0.0, 0.0, 0.0}, offset); }
+    static Transform2D Translation(Point2D offset) { return Transform2D({}, offset); }
     static Transform2D Scale(float factor) {
-        return Transform2D(Matrix2(factor, 0.0, 0.0, factor), {0.0, 0.0});
+        return Transform2D({factor, 0.0, 0.0, factor}, {});
     }
-
-    Matrix2 basis;
-    Point2D origin;
 
     Point2D operator*(const Point2D &vector) const {
         return basis * vector + origin;
