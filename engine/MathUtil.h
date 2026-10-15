@@ -23,6 +23,8 @@ struct Point2D {
     bool operator==(const Point2D &other) const { return x == other.x && y == other.y; }
     bool operator<(const Point2D &other) const { return x < other.x && y < other.y; }
     bool operator>(const Point2D &other) const { return x > other.x && y > other.y; }
+    bool operator<=(const Point2D &other) const { return x <= other.x && y <= other.y; }
+    bool operator>=(const Point2D &other) const { return x >= other.x && y >= other.y; }
 
     Point2D &operator+=(const Point2D &other) {
         x += other.x;
@@ -133,48 +135,71 @@ struct Rect {
     Point2D topLeft;
     Point2D bottomRight;
 
+    Rect() : topLeft(0, 0), bottomRight(-1, -1) {}
     Rect(float left, float top, float width, float height)
         : topLeft(Point2D(left, top)), bottomRight(Point2D(left + width, top + height)) {}
-    Rect(Point2D tl = {0, 0}, int w = 0, int h = 0)
-        : topLeft(tl), bottomRight(tl + Point2D(w, h)) {}
+    Rect(Point2D tl, int w, int h) : topLeft(tl), bottomRight(tl + Point2D(w, h)) {}
     // Creates bounding box around p1 and p2 with positive width/height
     Rect(Point2D p1, Point2D p2) : topLeft(p1.Min(p2)), bottomRight(p1.Max(p2)) {}
     Rect(Point2D center, float radius)
         : topLeft(center.x - radius), bottomRight(center.x + radius) {}
+    Rect(Point2D point) : topLeft(point), bottomRight(point) {}
     Rect(Circle circle)
         : topLeft(circle.center - circle.radius), bottomRight(circle.center + circle.radius) {}
     Rect(Line line) : topLeft(line.p1.Min(line.p2)), bottomRight(line.p1.Max(line.p2)) {}
 
     Rect operator|(const Point2D &other) const {
-        Rect result;
-        result.topLeft = topLeft.Min(other);
-        result.bottomRight = bottomRight.Max(other);
-        return result;
-    }
-    Rect operator|(const Rect &other) const {
-        if (!other.IsEmpty()) {
-            return *this | other.topLeft | other.bottomRight;
-        } else {
-            return *this;
-        }
-    }
-    Rect operator|(const Line &other) const { return *this | other.p1 | other.p2; }
-    Rect operator&(const Rect &other) const {
-        if (!other.IsEmpty()) {
+        if (!IsEmpty()) {
             Rect result;
-            result.topLeft = topLeft.Max(other.topLeft);
-            result.bottomRight =
-                bottomRight.Min(other.bottomRight);  // stop points from crossing over
+            result.topLeft = topLeft.Min(other);
+            result.bottomRight = bottomRight.Max(other);
             return result;
         } else {
+            return Rect(other);
+        }
+    }
+    Rect operator|(const Rect &other) const {
+        if (!IsEmpty()) {
+            if (!other.IsEmpty()) {
+                return *this | other.topLeft | other.bottomRight;
+            } else {
+                return *this;
+            }
+        } else {
+            return other;
+        }
+    }
+    Rect operator|(const Line &other) const {
+        if (!IsEmpty()) {
+            return *this | other.p1 | other.p2;
+        } else {
             return *this;
         }
     }
-    Rect operator+(const Point2D &other) const { return *this + other; }
+    Rect operator&(const Rect &other) const {
+        if (!IsEmpty()) {
+            if (!other.IsEmpty()) {
+                Rect result;
+                result.topLeft = topLeft.Max(other.topLeft);
+                result.bottomRight = bottomRight.Min(other.bottomRight);
+                return result;
+            } else {
+                return other;
+            }
+        } else {
+            return *this;
+        }
+    }
+    Rect operator+(const Point2D &other) const { return *this | other; }
 
     Rect &operator|=(const Point2D &other) {
-        topLeft = topLeft.Min(other);
-        bottomRight = bottomRight.Max(other);
+        if (!IsEmpty()) {
+            topLeft = topLeft.Min(other);
+            bottomRight = bottomRight.Max(other);
+        } else {
+            topLeft = other;
+            bottomRight = other;
+        }
         return *this;
     }
     Rect &operator|=(const Rect &other) {
@@ -193,6 +218,8 @@ struct Rect {
         if (!other.IsEmpty()) {
             topLeft = topLeft.Max(other.topLeft);
             bottomRight = bottomRight.Min(other.bottomRight);
+        } else {
+            *this = other;
         }
         return *this;
     }
@@ -215,7 +242,7 @@ struct Rect {
     bool IsInside(const Point2D &p) const {
         return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
     }
-    bool IsEmpty() const { return !(topLeft < bottomRight); }
+    bool IsEmpty() const { return !(topLeft <= bottomRight); }
     float Width() const {
         if (IsEmpty()) return 0;
         return bottomRight.x - topLeft.x;
@@ -259,9 +286,7 @@ struct Matrix2 {
                        cells[2] * other.cells[1] + cells[3] * other.cells[3]);
     }
 
-    float Determinant() const {
-        return cells[0] * cells[3] - cells[1] * cells[2];
-    }
+    float Determinant() const { return cells[0] * cells[3] - cells[1] * cells[2]; }
 
     Matrix2 Inverse() const {
         float determinant = Determinant();
@@ -282,21 +307,31 @@ struct Transform2D {
         return Transform2D(Matrix2(cosAngle, -sinAngle, sinAngle, cosAngle), {});
     }
     static Transform2D Translation(Point2D offset) { return Transform2D({}, offset); }
-    static Transform2D Scale(float factor) {
-        return Transform2D({factor, 0.0, 0.0, factor}, {});
+    static Transform2D Scale(float factor) { return Transform2D({factor, 0.0, 0.0, factor}, {}); }
+
+    Point2D operator*(const Point2D &vector) const { return basis * vector + origin; }
+
+    Line operator*(const Line &line) const { return Line(*this * line.p1, *this * line.p2); }
+
+    // assumes uniform scaling
+    Circle operator*(const Circle &circle) const {
+        float scalingFactor = hypotf(basis.cells[0], basis.cells[2]);
+        return Circle(circle.center, circle.radius * scalingFactor);
     }
 
-    Point2D operator*(const Point2D &vector) const {
-        return basis * vector + origin;
+    Rect operator*(const Rect &rect) const {
+        Point2D p0 = *this * rect.topLeft;
+        Point2D p1 = *this * Point2D(rect.topLeft.x, rect.bottomRight.y);
+        Point2D p2 = *this * rect.bottomRight;
+        Point2D p3 = *this * Point2D(rect.bottomRight.x, rect.topLeft.y);
+        return Rect(p0, p1) | p2 | p3;
     }
 
     Transform2D operator*(const Transform2D &other) const {
         return Transform2D(basis * other.basis, basis * other.origin + origin);
     }
 
-    Transform2D Inverse() const {
-        return Transform2D(basis.Inverse(), origin * -1);
-    }
+    Transform2D Inverse() const { return Transform2D(basis.Inverse(), origin * -1); }
 };
 
 }  // namespace CMPUT350

@@ -2,6 +2,7 @@
 #define GRAPHICS_OBJECT_H
 
 #include "GameObject.h"
+#include "MathUtil.h"
 
 namespace CMPUT350 {
 
@@ -13,6 +14,12 @@ public:
 
     virtual void RenderBackground(GameContext *context);
     virtual void RenderForeground(GameContext *context);
+   	// Center of object with respect to rotation
+	virtual Point2D GetLocation() const = 0;
+	// Return the rotation of the object in radians
+	virtual float GetRotation() const = 0;
+
+	Transform2D GetTransform() const;
 };
 
 }  // namespace CMPUT350
