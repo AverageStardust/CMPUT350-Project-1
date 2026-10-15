@@ -135,7 +135,7 @@ struct Rect {
     Point2D topLeft;
     Point2D bottomRight;
 
-    Rect() : topLeft(0, 0), bottomRight(-1, -1) {}
+    Rect() : topLeft({0, 0}), bottomRight({-1, -1}) {}
     Rect(float left, float top, float width, float height)
         : topLeft(Point2D(left, top)), bottomRight(Point2D(left + width, top + height)) {}
     Rect(Point2D tl, int w, int h) : topLeft(tl), bottomRight(tl + Point2D(w, h)) {}
@@ -149,7 +149,7 @@ struct Rect {
     Rect(Line line) : topLeft(line.p1.Min(line.p2)), bottomRight(line.p1.Max(line.p2)) {}
 
     Rect operator|(const Point2D &other) const {
-        if (!IsEmpty()) {
+        if (Exists()) {
             Rect result;
             result.topLeft = topLeft.Min(other);
             result.bottomRight = bottomRight.Max(other);
@@ -158,73 +158,64 @@ struct Rect {
             return Rect(other);
         }
     }
+
     Rect operator|(const Rect &other) const {
-        if (!IsEmpty()) {
-            if (!other.IsEmpty()) {
-                return *this | other.topLeft | other.bottomRight;
-            } else {
-                return *this;
-            }
-        } else {
-            return other;
-        }
+        if (!other.Exists()) return *this;
+
+        return *this | other.topLeft | other.bottomRight;
     }
+
     Rect operator|(const Line &other) const {
-        if (!IsEmpty()) {
-            return *this | other.p1 | other.p2;
-        } else {
-            return *this;
-        }
+        return *this | other.p1 | other.p2;
     }
+
     Rect operator&(const Rect &other) const {
-        if (!IsEmpty()) {
-            if (!other.IsEmpty()) {
-                Rect result;
-                result.topLeft = topLeft.Max(other.topLeft);
-                result.bottomRight = bottomRight.Min(other.bottomRight);
-                return result;
-            } else {
-                return other;
-            }
+        if (Exists() && other.Exists()) {
+            Rect result;
+            result.topLeft = topLeft.Max(other.topLeft);
+            result.bottomRight = bottomRight.Min(other.bottomRight);
+            return result;
         } else {
-            return *this;
+            return {};
         }
     }
-    Rect operator+(const Point2D &other) const { return *this | other; }
 
     Rect &operator|=(const Point2D &other) {
-        if (!IsEmpty()) {
+        if (Exists()) {
             topLeft = topLeft.Min(other);
             bottomRight = bottomRight.Max(other);
         } else {
             topLeft = other;
             bottomRight = other;
         }
+
         return *this;
     }
+
     Rect &operator|=(const Rect &other) {
-        if (!other.IsEmpty()) {
+        if (other.Exists()) {
             *this |= other.topLeft;
             *this |= other.bottomRight;
         }
+
         return *this;
     }
+
     Rect &operator|=(const Line &other) {
         *this |= other.p1;
         *this |= other.p2;
         return *this;
     }
+
     Rect &operator&=(const Rect &other) {
-        if (!other.IsEmpty()) {
-            topLeft = topLeft.Max(other.topLeft);
-            bottomRight = bottomRight.Min(other.bottomRight);
-        } else {
-            *this = other;
+        if (!Exists()) return *this;
+        if (!other.Exists()) {
+            return *this = {};
         }
-        return *this;
-    }
-    Rect &operator+=(const Point2D &other) {
-        *this |= other;
+
+        topLeft = topLeft.Max(other.topLeft);
+        bottomRight = bottomRight.Min(other.bottomRight);
+
         return *this;
     }
 
@@ -232,28 +223,32 @@ struct Rect {
         topLeft += inset;
         bottomRight -= inset;
     }
+
     Rect Inseted(int inset) const {
         Rect result;
         result.topLeft = topLeft + inset;
         result.bottomRight = topLeft - inset;
         return result;
     }
-    bool IsIntersecting(const Rect &p) const { return !(*this & p).IsEmpty(); }
+
+    bool IsIntersecting(const Rect &p) const { return (*this & p).Exists(); }
     bool IsInside(const Point2D &p) const {
         return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
     }
-    bool IsEmpty() const { return !(topLeft <= bottomRight); }
     float Width() const {
-        if (IsEmpty()) return 0;
+        if (!Exists()) return 0;
         return bottomRight.x - topLeft.x;
     }
     float Height() const {
-        if (IsEmpty()) return 0;
+        if (!Exists()) return 0;
         return bottomRight.y - topLeft.y;
     }
     Point2D Size() const {
-        if (IsEmpty()) return Point2D();
+        if (!Exists()) return {};
         return bottomRight - topLeft;
+    }
+    bool Exists() const {
+        return bottomRight >= topLeft;
     }
 };
 
@@ -294,6 +289,11 @@ struct Matrix2 {
     }
 };
 
+static std::ostream &operator<<(std::ostream &os, const Matrix2 &m) {
+    os << "(" << m.cells << ")";
+    return os;
+}
+
 // Augmented 2x2 matrix representing 2d transformations
 struct Transform2D {
     Matrix2 basis;
@@ -333,6 +333,11 @@ struct Transform2D {
 
     Transform2D Inverse() const { return Transform2D(basis.Inverse(), origin * -1); }
 };
+
+static std::ostream &operator<<(std::ostream &os, const Transform2D &t) {
+    os << "(" << t.basis << ", " << t.basis << ")";
+    return os;
+}
 
 }  // namespace CMPUT350
 

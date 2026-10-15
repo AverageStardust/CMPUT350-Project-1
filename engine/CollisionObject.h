@@ -27,7 +27,7 @@ struct Shape {
 };
 
 class CollisionObject : public GraphicsObject {
-private:
+public:
     // global bounds
     Rect bounds;
 

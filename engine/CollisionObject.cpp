@@ -25,6 +25,6 @@ void CollisionObject::UpdateBounds() {
 
 bool CollisionObject::CheckCollision(CollisionObject &other) {
     // TODO: more than bound checking
-    return (bounds & other.bounds).IsEmpty();
+    return (bounds & other.bounds).Exists();
 }
 }  // namespace CMPUT350
