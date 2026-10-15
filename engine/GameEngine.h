@@ -31,6 +31,9 @@ public:
     GameEngine &operator=(GameEngine &&) = delete;       // Prevent move-assignment
 
     void AddGameObject(std::shared_ptr<GameObject> gameObject) override;
+    void InstallKeyDownNotification(int, const std::string &notification) override;
+    void InstallKeyUpNotification(int, const std::string &notification) override;
+    void CallNotification();
 
     bool ProcessEvents(GameContext *context);
     void cleanupDeadGameObjects();
@@ -43,8 +46,12 @@ private:
     std::shared_ptr<sf::RenderWindow> mWindow;
     std::shared_ptr<sf::Font> mFont;
     std::vector<std::shared_ptr<GameObject>> mGameObjects;
-    std::vector<std::shared_ptr<GameObject>>
-        addedGameObjects;  // Newly added objects that will be activated on the next frame
+    std::vector<std::shared_ptr<GameObject>> addedGameObjects;  // Newly added objects that will be activated on the next frame
+
+    // Notification manager (the vectors are mapped to one another)
+    std::shared_ptr<sf::NotificationManager> mNotificationManager;
+    std::vector<int> registeredKeys; // Positive ints are for keydown events, negative ints are for keyup events
+    std::vector<std::string> registeredNotifications;
 };
 
 }  // namespace CMPUT350

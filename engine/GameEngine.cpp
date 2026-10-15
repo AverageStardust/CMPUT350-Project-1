@@ -24,10 +24,48 @@ GameEngine::~GameEngine() {
     mWindow->close();
 }
 
+
+
+// EngineView functions -------------------------------------------
+
 void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
     // Add the gameObject to our "added" vector to tell the game to activate it
     addedGameObjects.push_back(gameObject);
 }
+
+// Key notifications
+void InstallKeyDownNotification(int notifKey, const std::string &notification) {
+    // Register key with Notification manager for keydown events.
+    // NotifKey is the scancode of the key we want to implement.
+    registeredKeys.push_back(notifKey);
+    registeredNotifications.push_back(notification);
+    
+}
+void InstallKeyUpNotification(int notifKey, const std::string &notification) {
+    // Register key with Notification manager for keyup events.
+    // NotifKey is the scancode of the key we want to implement.
+    registeredKeys.push_back(-notifKey);
+    registeredNotifications.push_back(notification);
+}
+
+void CallNotification(int notifKey) {
+    for (int i = 0; i < registeredKeys.size(); ++i) {
+        if (registeredKeys[i] == notifKey) {
+            mNotificationManager->Notify(registeredNotifications[i])
+            break;
+        }
+    }
+}
+
+// Iterators
+const_iterator begin() { return mGameObjects.begin(); }
+const_iterator end() { return mGameObjects.end(); }
+
+// ----------------------------------------------------------------
+
+
+
+// Engine loop functions ------------------------------------------
 
 void GameEngine::cleanupDeadGameObjects() {
     // Logic copied from Lab 2
@@ -55,11 +93,11 @@ bool GameEngine::ProcessEvents(GameContext *context) {
                 sf::FloatRect({0.f, 0.f}, {float(resize->size.x), float(resize->size.y)})));
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
             for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-                gObj->HandleKeyEvent(context, char(keyPressed->scancode), true);
+                CallNotification(static_cast<int>(keyPressed->scancode));
             }
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyReleased>()) {
             for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-                gObj->HandleKeyEvent(context, char(keyPressed->scancode), false);
+                CallNotification(-1 * static_cast<int>(keyPressed->scancode));
             }
         }
     }
@@ -113,6 +151,10 @@ void GameEngine::renderObjects(GameContext *context) {
         }
     }
 }
+
+// ----------------------------------------------------------------
+
+
 
 /**
  * @method Run
