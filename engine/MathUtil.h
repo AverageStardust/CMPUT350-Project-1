@@ -143,6 +143,7 @@ struct Rect {
         : topLeft(center.x - radius), bottomRight(center.x + radius) {}
     Rect(Circle circle)
         : topLeft(circle.center - circle.radius), bottomRight(circle.center + circle.radius) {}
+    Rect(Line line) : topLeft(line.p1.Min(line.p2)), bottomRight(line.p1.Max(line.p2)) {}
 
     Rect operator|(const Point2D &other) const {
         Rect result;
@@ -210,9 +211,7 @@ struct Rect {
         result.bottomRight = topLeft - inset;
         return result;
     }
-    bool IsIntersecting(const Rect &p) const {
-        return !(*this & p).IsEmpty();
-    }
+    bool IsIntersecting(const Rect &p) const { return !(*this & p).IsEmpty(); }
     bool IsInside(const Point2D &p) const {
         return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
     }
@@ -235,6 +234,68 @@ static std::ostream &operator<<(std::ostream &os, const Rect &r) {
     os << "(" << r.topLeft << ", " << r.bottomRight << ")";
     return os;
 }
+
+// 2x2 matrix
+struct Matrix2 {
+    float cells[4];  // row-major
+
+    Matrix2() : cells{1.0, 0.0, 0.0, 1.0} {}
+    Matrix2(float a, float b, float c, float d) : cells{a, b, c, d} {}
+    Matrix2(float (&&basis)[4]) { std::copy(basis, basis + 4, this->cells); }
+
+    Matrix2 operator*(const float &scalar) const {
+        return Matrix2(cells[0] * scalar, cells[1] * scalar, cells[2] * scalar, cells[3] * scalar);
+    }
+
+    Point2D operator*(const Point2D &vector) const {
+        return Point2D(cells[0] * vector.x + cells[1] * vector.y,
+                       cells[2] * vector.x + cells[3] * vector.y);
+    }
+
+    Matrix2 operator*(const Matrix2 &other) const {
+        return Matrix2(cells[0] * other.cells[0] + cells[1] * other.cells[2],
+                       cells[0] * other.cells[1] + cells[1] * other.cells[3],
+                       cells[2] * other.cells[0] + cells[3] * other.cells[2],
+                       cells[2] * other.cells[1] + cells[3] * other.cells[3]);
+    }
+
+    float Determinant() const {
+        return cells[0] * cells[3] - cells[1] * cells[2];
+    }
+
+    Matrix2 Inverse() const {
+        float determinant = Determinant();
+        return Matrix2(cells[3], -cells[1], -cells[2], cells[0]) * (1 / determinant);
+    }
+};
+
+// Augmented 2x2 matrix representing 2d transformations
+struct Transform {
+    static Transform Rotation(float angle) {
+        float cosAngle = std::cos(angle);
+        float sinAngle = std::sin(angle);
+        return Transform(Matrix2(cosAngle, -sinAngle, sinAngle, cosAngle), {0.0, 0.0});
+    }
+    static Transform Translation(Point2D offset) { return Transform({0.0, 0.0, 0.0, 0.0}, offset); }
+    static Transform Scale(float factor) {
+        return Transform(Matrix2(factor, 0.0, 0.0, factor), {0.0, 0.0});
+    }
+
+    Matrix2 basis;
+    Point2D origin;
+
+    Point2D operator*(const Point2D &vector) const {
+        return basis * vector + origin;
+    }
+
+    Transform operator*(const Transform &other) const {
+        return Transform(basis * other.basis, basis * other.origin);
+    }
+
+    Transform Inverse() const {
+        return Transform(basis.Inverse(), origin * -1);
+    }
+};
 
 }  // namespace CMPUT350
 
