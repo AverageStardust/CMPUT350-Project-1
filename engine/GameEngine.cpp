@@ -1,5 +1,6 @@
 #include "GameEngine.h"
 #include <memory>
+#include "CollisionObject.h"
 #include "SFML/Graphics/Font.hpp"
 
 /// @brief
@@ -79,13 +80,14 @@ void GameEngine::processCollisions() {
 
         if (collider != nullptr) {
             colliders.push_back(collider);
-            bounds.push_back(collider->GetBounds());
+            collider->UpdateBounds();
         }
     }
 
     for (int i = 0; i < colliders.size(); i++) {
         for (int j = i + 1; j < colliders.size(); j++) {
-            if (bounds[i].IsIntersecting(bounds[j])) {
+            bool isColliding = colliders[i]->CheckCollision(*colliders[j]);
+            if (isColliding) {
                 colliders[i]->CollisionEnter(colliders[j]);
                 colliders[j]->CollisionEnter(colliders[i]);
             }

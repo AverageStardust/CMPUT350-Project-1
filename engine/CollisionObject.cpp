@@ -1,4 +1,5 @@
 #include "CollisionObject.h"
+
 #include "MathUtil.h"
 
 namespace CMPUT350 {
@@ -20,5 +21,10 @@ void CollisionObject::UpdateBounds() {
                 break;
         }
     }
+}
+
+bool CollisionObject::CheckCollision(CollisionObject &other) {
+    // TODO: more than bound checking
+    return (bounds & other.bounds).IsEmpty();
 }
 }  // namespace CMPUT350

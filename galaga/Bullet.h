@@ -7,7 +7,7 @@
 class Bullet : public CMPUT350::CollisionObject
 {
 public:
-    Bullet(CMPUT350::Point2D location, CMPUT350::Point2D heading, bool player);
+    Bullet(CMPUT350::Point2D location, CMPUT350::Point2D velocity, bool player);
     bool IsPlayerBullet();
 
     // GameObject Functions
@@ -22,11 +22,13 @@ public:
 
     // Collision Object Functions
     void CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject>& obj) override;
-    const CMPUT350::Rect& GetBounds() override;
+    const std::vector<CMPUT350::Shape> &GetShapes() override;
+
+    CMPUT350::Point2D GetLocation() const override;
 
 private:
     CMPUT350::Point2D location;
-    CMPUT350::Point2D heading;
+    CMPUT350::Point2D velocity;
     bool isFromPlayer;
 
     float boundWidth;

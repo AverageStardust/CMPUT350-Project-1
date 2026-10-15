@@ -7,9 +7,6 @@
 
 #include "Bullet.h"
 #include "CollisionObject.h"
-#include "DrawContext.h"
-#include "Keyboard.h"
-#include "MathUtil.h"
 
 class Player : public CMPUT350::CollisionObject {
     static const int MAX_PLAYER_BULLETS = 2;
@@ -30,7 +27,10 @@ public:
 
     // Collision Object Functions
     void CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) override;
-    const CMPUT350::Rect &GetBounds() override;
+    const std::vector<CMPUT350::Shape> &GetShapes() override;
+
+    CMPUT350::Point2D GetLocation() const override;
+    float GetRotation() const override;
 
 private:
     CMPUT350::Point2D location;

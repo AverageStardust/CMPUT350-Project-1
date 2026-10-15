@@ -37,9 +37,15 @@ void Enemy::Kill() { alive = false; }
 
 bool Enemy::IsAlive() const { return alive; }
 
-const CMPUT350::Rect &Enemy::GetBounds() {
-    static CMPUT350::Rect bounds;
-    bounds = CMPUT350::Rect(location.x - boundWidth / 2, location.y - boundHeight / 2, boundWidth,
-                            boundHeight);
-    return bounds;
+CMPUT350::Point2D Enemy::GetLocation() const { return location; };
+
+float Enemy::GetRotation() const { return 0; };
+
+const std::vector<CMPUT350::Shape> &Enemy::GetShapes() {
+    static std::vector<CMPUT350::Shape> shapes;
+
+    shapes.clear();
+    shapes.push_back(CMPUT350::Rect(-boundWidth / 2, -boundHeight / 2, boundWidth, boundHeight));
+
+    return shapes;
 }

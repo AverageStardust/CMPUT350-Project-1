@@ -1,5 +1,9 @@
 #include "Player.h"
 
+#include "DrawContext.h"
+#include "Keyboard.h"
+#include "MathUtil.h"
+
 Player::Player(CMPUT350::Point2D location) : location(location) {}
 
 void Player::Initialize(CMPUT350::GameContext *context) {
@@ -73,7 +77,15 @@ bool Player::IsAlive() const {
     return alive;
 }
 
-const CMPUT350::Rect &Player::GetBounds() {
-    static CMPUT350::Rect sBounds(location.y - boundHeight/2, location.x - boundWidth/2, boundWidth, boundHeight);
-    return sBounds;
+CMPUT350::Point2D Player::GetLocation() const { return location; };
+
+float Player::GetRotation() const { return 0; };
+
+const std::vector<CMPUT350::Shape> &Player::GetShapes() {
+    static std::vector<CMPUT350::Shape> shapes;
+
+    shapes.clear();
+    shapes.push_back(CMPUT350::Rect(-boundWidth / 2, -boundHeight / 2, boundWidth, boundHeight));
+
+    return shapes;
 }

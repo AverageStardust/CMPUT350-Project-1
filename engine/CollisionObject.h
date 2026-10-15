@@ -38,6 +38,7 @@ public:
 
 	// calls GetShapes and generates a bounding box for itself
     void UpdateBounds();
+    bool CheckCollision(CollisionObject &other);
 
     // Return the internal shapes in the object. Shapes can be:
     // lines, points/circles, or axis-aligned rectangles
