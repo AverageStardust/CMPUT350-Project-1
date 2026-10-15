@@ -1,6 +1,5 @@
 #include "Enemy.h"
 
-#include "Bullet.h"
 #include "DrawContext.h"
 
 Enemy::Enemy(CMPUT350::Point2D loc) : location(loc) {}

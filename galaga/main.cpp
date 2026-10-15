@@ -1,5 +1,3 @@
-#include <random>
-#include "DrawContext.h"
 #include "GameEngine.h"
 #include "MathUtil.h"
 #include "Player.h"
@@ -9,7 +7,7 @@
 int main()
 {
     CMPUT350::GameEngine engine(768, 1024, "Galaga");
-    auto player = std::make_shared<Player>(CMPUT350::Point2D(768 / 2, 900));
+    auto player = std::make_shared<Player>(CMPUT350::Point2D(int(768 / 2), 900));
     engine.AddGameObject(player);
     engine.AddGameObject(std::make_shared<Stars>(250, CMPUT350::Rect(0, 0, 768, 1024)));
     for (int y = 0; y < 4; y++)
