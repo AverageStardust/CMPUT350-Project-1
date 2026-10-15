@@ -289,7 +289,7 @@ struct Transform {
     }
 
     Transform operator*(const Transform &other) const {
-        return Transform(basis * other.basis, basis * other.origin);
+        return Transform(basis * other.basis, basis * other.origin + origin);
     }
 
     Transform Inverse() const {
