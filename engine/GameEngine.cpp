@@ -138,6 +138,9 @@ void GameEngine::renderObjects(GameContext *context) {
         std::shared_ptr<GraphicsObject> graphicObj =
             std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
+            context->ScreenContext->SetContextOffset(gObj->getLocation());
+            context->ScreenContext->SetContextRotation(gObj->getRotation());
+
             graphicObj->RenderBackground(context);
         }
     }
@@ -163,7 +166,7 @@ void GameEngine::renderObjects(GameContext *context) {
  * all objects have been destroyed.
  */
 void GameEngine::Run() {
-    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont));
+    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont), new GUIContext(mWindow, mFont));
 
     while (true)  // window is open
     {

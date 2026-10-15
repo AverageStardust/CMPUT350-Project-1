@@ -9,11 +9,15 @@ namespace CMPUT350 {
 
 class GameContext {
 public:
-    GameContext(EngineView *mEngineView, DrawContext *ScreenContext)
-        : mEngineView(mEngineView), ScreenContext(ScreenContext) {};
+    GameContext(EngineView *mEngineView, DrawContext *ScreenContext, DrawContext *GUIContext, NotificationManager *mNotificationManager)
+        : mEngineView(mEngineView), ScreenContext(ScreenContext), GUIContext(GUIContext), mNotificationManager(mNotificationManager) {};
 
     EngineView *mEngineView;
-    DrawContext *ScreenContext;
+	DrawContext *ScreenContext;
+	DrawContext *GUIContext;
+	std::weak_ptr<GameObject> CurrObject;
+	NotificationManager *mNotificationManager;
+	int currentFrame;
 };
 
 }  // namespace CMPUT350
