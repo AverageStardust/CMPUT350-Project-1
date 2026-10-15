@@ -32,8 +32,8 @@ void Bullet::RenderBackground(CMPUT350::GameContext *context) {
 }
 
 void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) {
-    if ((typeid(obj) == typeid(Enemy) && IsPlayerBullet()) ||
-        typeid(obj) == typeid(Player) && !IsPlayerBullet()) {
+    if ((typeid(*obj) == typeid(Enemy) && IsPlayerBullet()) ||
+        typeid(*obj) == typeid(Player) && !IsPlayerBullet()) {
         obj->Kill();
         Kill();
     }

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "GraphicsObject.h"
+#include "GameEngine.h"
 #include "MathUtil.h"
 
 namespace CMPUT350 {
@@ -27,9 +28,10 @@ struct Shape {
 };
 
 class CollisionObject : public GraphicsObject {
-public:
+private:
     // global bounds
     Rect bounds;
+    friend void GameEngine::renderObjects(GameContext *context);
 
 public:
     virtual void CollisionEnter(const std::shared_ptr<CollisionObject> &obj) = 0;
