@@ -1,3 +1,6 @@
+#ifndef BEZIER_H
+#define BEZIER_H
+
 #include "MathUtil.h"
 
 namespace CMPUT350 {
@@ -6,7 +9,7 @@ private:
     Point2D points[4];
 
 public:
-    Bezier(const Point2D (&points)[4]);
+    Bezier(const Point2D (&&points)[4]);
 
     Point2D GetPoint(float t) const;
     Point2D GetSlope(float t) const;
@@ -15,3 +18,5 @@ public:
     static Point2D GetSlope(const Point2D (&points)[4], float t);
 };
 }  // namespace CMPUT350
+
+#endif  // BEZIER_H

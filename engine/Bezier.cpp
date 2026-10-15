@@ -3,7 +3,7 @@
 #include <algorithm>
 
 namespace CMPUT350 {
-Bezier::Bezier(const Point2D (&points)[4]) { std::copy(points, points + 4, this->points); }
+Bezier::Bezier(const Point2D (&&points)[4]) { std::copy(points, points + 4, this->points); }
 
 Point2D Bezier::GetPoint(float t) const {
     return Bezier::GetPoint(points, t);
