@@ -1,12 +1,5 @@
 #include "Player.h"
 
-#include <cassert>
-#include <memory>
-
-#include "Bullet.h"
-#include "DrawContext.h"
-#include "MathUtil.h"
-
 Player::Player(CMPUT350::Point2D location) : location(location) {}
 
 void Player::Initialize(CMPUT350::GameContext *context) {
@@ -26,13 +19,13 @@ void Player::LateUpdate(CMPUT350::GameContext *context) {}
 
 void Player::HandleKeyEvent(CMPUT350::GameContext *context, int key, bool isPressed) {
     switch (key) {
-        case 0:  // A
+        case CMPUT350::Key::A:
             isLeftPressed = isPressed;
             break;
-        case 3:  // D
+        case CMPUT350::Key::D:
             isRightPressed = isPressed;
             break;
-        case 40:  // Space
+        case CMPUT350::Key::Space:
             if (isPressed) {
                 bullets.remove_if([](std::weak_ptr<Bullet> bullet) { return bullet.expired(); });
                 int size = distance(bullets.begin(), bullets.end());  // yuck
