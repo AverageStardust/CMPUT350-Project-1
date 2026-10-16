@@ -21,6 +21,7 @@ void CollisionObject::UpdateCollider() {
                 bounds |= transform * shape.shape.rect;
                 break;
         }
+        break;
     }
 }
 
@@ -50,6 +51,7 @@ bool Intersects(const Shape &shapeA, const Transform2D &transformA, const Shape 
                 case ShapeType::kRect:
                     return transformedA.Intersects(transformB * shapeB.shape.rect, point);
             }
+            break;
         }
 
         case ShapeType::kRect: {
@@ -62,8 +64,11 @@ bool Intersects(const Shape &shapeA, const Transform2D &transformA, const Shape 
                 case ShapeType::kRect:
                     return transformedA.Intersects(transformB * shapeB.shape.rect, point);
             }
+            break;
         }
     }
+
+    return false;
 }
 
 Collision CollisionObject::CheckCollision(CollisionObject &other) {

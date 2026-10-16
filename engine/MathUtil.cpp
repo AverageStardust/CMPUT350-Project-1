@@ -138,7 +138,7 @@ bool Line::Intersects(const Rect &other, Point2D &point) const {
     return Intersects(Quad(other), point);
 }
 bool Line::Intersects(const Quad &other, Point2D &point) const {
-    float minT = -1;
+    float minT = 2;
     float t;
 
     if (lineInterectT(*this, other.Segment(0), t)) minT = std::min(minT, t);
@@ -146,7 +146,7 @@ bool Line::Intersects(const Quad &other, Point2D &point) const {
     if (lineInterectT(*this, other.Segment(2), t)) minT = std::min(minT, t);
     if (lineInterectT(*this, other.Segment(3), t)) minT = std::min(minT, t);
 
-    bool intersects = minT != -1;
+    bool intersects = minT < 2;
 
     if (intersects) point = Lerp(minT);
 
