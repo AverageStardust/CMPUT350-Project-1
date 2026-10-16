@@ -52,7 +52,7 @@ private:
     std::shared_ptr<sf::Font> mFont;
 
     friend class GameEngine;
-	void SetContextOffset(Point2D p);                                                                   //
+	void SetContextOffset(Point2D p);                                                                   //   TODO
 	void SetContextRotation(float rotation);                                                            //
 	Point2D Transform(Point2D p);                                                                       //
 	Point2D ReverseTransform(Point2D p);                                                                //
