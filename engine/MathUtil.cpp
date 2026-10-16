@@ -260,9 +260,7 @@ Line Transform2D::operator*(const Line &line) const {
     return Line(*this * line.p1, *this * line.p2);
 }
 Circle Transform2D::operator*(const Circle &circle) const {
-    // assumes uniform scaling
-    float scalingFactor = hypotf(basis.cells[0], basis.cells[2]);
-    return Circle(circle.center, circle.radius * scalingFactor);
+    return Circle(circle.center, circle.radius * Scale());
 }
 Rect Transform2D::operator*(const Rect &rect) const {
     Point2D p0 = *this * rect.topLeft;
@@ -274,7 +272,17 @@ Rect Transform2D::operator*(const Rect &rect) const {
 Transform2D Transform2D::operator*(const Transform2D &other) const {
     return Transform2D(basis * other.basis, basis * other.origin + origin);
 }
+
 Transform2D Transform2D::Inverse() const { return Transform2D(basis.Inverse(), origin * -1); }
+float Transform2D::Scale() const {
+    return hypotf(basis.cells[0], basis.cells[2]);
+}
+Point2D Transform2D::Translation() const {
+    return origin;
+}
+float Transform2D::Rotation() const {
+    return atan2(basis.cells[2], basis.cells[0]);
+}
 
 std::ostream &operator<<(std::ostream &os, const Transform2D &t) {
     os << "(" << t.basis << ", " << t.basis << ")";
