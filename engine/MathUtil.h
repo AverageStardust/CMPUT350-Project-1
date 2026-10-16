@@ -163,7 +163,11 @@ struct Transform2D {
     Circle operator*(const Circle &circle) const;
     Rect operator*(const Rect &rect) const;
     Transform2D operator*(const Transform2D &other) const;
+
     Transform2D Inverse() const;
+    float Scale() const;
+    Point2D Translation() const;
+    float Rotation() const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Transform2D &t);
