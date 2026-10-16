@@ -30,6 +30,7 @@ const RGBColor white(255, 255, 255);
 const RGBColor black(0, 0, 0);
 const RGBColor gray(100, 100, 100);
 const RGBColor grey(200, 200, 200);
+const RGBColor orange(255, 165, 0);
 
 }  // namespace Colors
 

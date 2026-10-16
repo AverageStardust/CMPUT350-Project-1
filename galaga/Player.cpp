@@ -11,13 +11,14 @@ void Player::Initialize(CMPUT350::GameContext *context) {
     boundHeight = 40.0f;
 
     mEngineView = context->mEngineView;
+    ptrToSelf = context->CurrObject;
 
     // Sign up for key press notifications
-    context->mNotificationManager->Register(context->CurrObject, "shoot");
-    context->mNotificationManager->Register(context->CurrObject, "move_left");
-    context->mNotificationManager->Register(context->CurrObject, "stop_left");
-    context->mNotificationManager->Register(context->CurrObject, "move_right");
-    context->mNotificationManager->Register(context->CurrObject, "stop_right");
+    context->mNotificationManager->Register(ptrToSelf, "shoot");
+    context->mNotificationManager->Register(ptrToSelf, "move_left");
+    context->mNotificationManager->Register(ptrToSelf, "stop_left");
+    context->mNotificationManager->Register(ptrToSelf, "move_right");
+    context->mNotificationManager->Register(ptrToSelf, "stop_right");
 }
 
 void Player::Update(CMPUT350::GameContext *context) {
@@ -70,7 +71,7 @@ void Player::ReceiveNotification(const std::string &notification) {
 
         if (size < 2) {
             std::shared_ptr<Bullet> bullet =
-                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -20), true);
+                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -20), true, ptrToSelf);
             mEngineView->AddGameObject(bullet);
             bullets.push_front(bullet);
         }
