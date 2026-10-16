@@ -4,7 +4,6 @@
 
 #include "CollisionObject.h"
 #include "DrawContext.h"
-#include "MathUtil.h"
 #include "NotificationManager.h"
 #include "SFML/Graphics/Font.hpp"
 
@@ -232,6 +231,7 @@ void GameEngine::Run() {
 
         // Actually render to window
         mWindow->display();
+        context->currentFrame++;
     }
 
     delete context->ScreenContext;

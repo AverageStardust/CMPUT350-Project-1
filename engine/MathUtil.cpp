@@ -1,7 +1,6 @@
 #include "MathUtil.h"
 
 #include <algorithm>
-#include <limits>
 
 namespace CMPUT350 {
 
@@ -234,12 +233,15 @@ Rect Rect::operator|(const Point2D &other) const {
         return Rect(other);
     }
 }
+Rect Rect::operator|(const Line &other) const { return *this | other.p1 | other.p2; }
 Rect Rect::operator|(const Rect &other) const {
     if (!other.Exists()) return *this;
 
     return *this | other.topLeft | other.bottomRight;
 }
-Rect Rect::operator|(const Line &other) const { return *this | other.p1 | other.p2; }
+Rect Rect::operator|(const Quad &other) const {
+    return *this | other.points[0] | other.points[1] | other.points[2] | other.points[3];
+}
 Rect Rect::operator&(const Rect &other) const {
     if (Exists() && other.Exists()) {
         Rect result;
@@ -261,6 +263,11 @@ Rect &Rect::operator|=(const Point2D &other) {
 
     return *this;
 }
+Rect &Rect::operator|=(const Line &other) {
+    *this |= other.p1;
+    *this |= other.p2;
+    return *this;
+}
 Rect &Rect::operator|=(const Rect &other) {
     if (other.Exists()) {
         *this |= other.topLeft;
@@ -269,9 +276,11 @@ Rect &Rect::operator|=(const Rect &other) {
 
     return *this;
 }
-Rect &Rect::operator|=(const Line &other) {
-    *this |= other.p1;
-    *this |= other.p2;
+Rect &Rect::operator|=(const Quad &other) {
+    *this |= other.points[0];
+    *this |= other.points[1];
+    *this |= other.points[2];
+    *this |= other.points[3];
     return *this;
 }
 Rect &Rect::operator&=(const Rect &other) {
@@ -352,9 +361,10 @@ bool Quad::Intersects(const Rect &other, Point2D &point) const {
 bool Quad::Intersects(const Quad &other, Point2D &point) const {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            if (Segment(i).Intersects(Segment(j), point)) break;
+            if (Segment(i).Intersects(Segment(j), point)) return true;
         }
     }
+    return false;
 }
 
 std::ostream &operator<<(std::ostream &os, const Quad &q) {

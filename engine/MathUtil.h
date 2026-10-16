@@ -113,13 +113,15 @@ struct Rect {
     Rect(Line line) : topLeft(line.p1.Min(line.p2)), bottomRight(line.p1.Max(line.p2)) {}
 
     Rect operator|(const Point2D &other) const;
-    Rect operator|(const Rect &other) const;
     Rect operator|(const Line &other) const;
+    Rect operator|(const Rect &other) const;
+    Rect operator|(const Quad &other) const;
     Rect operator&(const Rect &other) const;
 
     Rect &operator|=(const Point2D &other);
-    Rect &operator|=(const Rect &other);
     Rect &operator|=(const Line &other);
+    Rect &operator|=(const Rect &other);
+    Rect &operator|=(const Quad &other);
     Rect &operator&=(const Rect &other);
 
     void Inset(int inset);
