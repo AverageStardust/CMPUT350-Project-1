@@ -176,6 +176,7 @@ struct Matrix2 {
     Matrix2 Inverse() const;
 };
 
+Point2D operator*(const Point2D &vector, const Matrix2 &transform);
 std::ostream &operator<<(std::ostream &os, const Matrix2 &m);
 
 // Augmented 2x2 matrix representing 2d transformations
@@ -202,6 +203,7 @@ struct Transform2D {
     float Rotation() const;
 };
 
+Point2D operator*(const Point2D &vector, const Transform2D &transform);
 Point2D &operator*=(Point2D &vector, const Transform2D &transform);
 Line &operator*=(Line &line, const Transform2D &transform);
 Circle &operator*=(Circle &circle, const Transform2D &transform);

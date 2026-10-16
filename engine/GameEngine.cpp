@@ -125,8 +125,8 @@ void GameEngine::ProcessCollisions() {
         for (int j = i + 1; j < colliders.size(); j++) {
             Collision colliding = colliders[i]->CheckCollision(*colliders[j]);
             if (colliding.isColliding) {
-                colliders[i]->CollisionEnter(colliders[j], colliding.point);
-                colliders[j]->CollisionEnter(colliders[i], colliding.point);
+                colliders[i]->CollisionEnter(colliders[j], colliding.point * colliders[i]->transform);
+                colliders[j]->CollisionEnter(colliders[i], colliding.point * colliders[j]->transform);
             }
         }
     }

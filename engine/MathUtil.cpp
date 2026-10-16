@@ -398,6 +398,9 @@ Matrix2 Matrix2::Inverse() const {
     return Matrix2(cells[3], -cells[1], -cells[2], cells[0]) * (1 / determinant);
 }
 
+Point2D operator*(const Point2D &vector, const Matrix2 &transform) {
+    return vector * transform.Inverse();
+}
 std::ostream &operator<<(std::ostream &os, const Matrix2 &m) {
     os << "(" << m.cells << ")";
     return os;
@@ -426,6 +429,12 @@ Quad Transform2D::operator*(const Quad &quad) const {
 Transform2D Transform2D::operator*(const Transform2D &other) const {
     return Transform2D(basis * other.basis, basis * other.origin + origin);
 }
+
+Transform2D Transform2D::Inverse() const { return Transform2D(basis.Inverse(), origin * -1); }
+float Transform2D::Scale() const { return std::hypotf(basis.cells[0], basis.cells[2]); }
+Point2D Transform2D::Translation() const { return origin; }
+float Transform2D::Rotation() const { return std::atan2(basis.cells[2], basis.cells[0]); }
+
 Point2D &operator*=(Point2D &vector, const Transform2D &transform) {
     return vector = transform * vector;
 }
@@ -437,12 +446,9 @@ Quad &operator*=(Quad &quad, const Transform2D &transform) { return quad = trans
 Transform2D &operator*=(Transform2D &other, const Transform2D &transform) {
     return other = transform * other;
 }
-
-Transform2D Transform2D::Inverse() const { return Transform2D(basis.Inverse(), origin * -1); }
-float Transform2D::Scale() const { return std::hypotf(basis.cells[0], basis.cells[2]); }
-Point2D Transform2D::Translation() const { return origin; }
-float Transform2D::Rotation() const { return std::atan2(basis.cells[2], basis.cells[0]); }
-
+Point2D operator*(const Point2D &vector, const Transform2D &transform) {
+    return vector * transform.Inverse();
+}
 std::ostream &operator<<(std::ostream &os, const Transform2D &t) {
     os << "(" << t.basis << ", " << t.basis << ")";
     return os;
