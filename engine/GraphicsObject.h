@@ -1,6 +1,7 @@
 #ifndef GRAPHICS_OBJECT_H
 #define GRAPHICS_OBJECT_H
 
+#include "GameEngine.h"
 #include "GameObject.h"
 #include "MathUtil.h"
 
@@ -20,6 +21,12 @@ public:
 	virtual float GetRotation() const;
 
 	Transform2D GetTransform() const;
+
+private:
+    Transform2D transform;
+    void UpdateTransform();
+
+    friend class GameEngine;
 };
 
 }  // namespace CMPUT350

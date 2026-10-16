@@ -28,7 +28,7 @@ void Bullet::Update(CMPUT350::GameContext *context) {
 void Bullet::LateUpdate(CMPUT350::GameContext *context) {}
 
 void Bullet::RenderBackground(CMPUT350::GameContext *context) {
-    context->ScreenContext->DrawLine(location, location - velocity, 4, CMPUT350::Colors::red);
+    context->ScreenContext->DrawLine({}, velocity * -1, 4, CMPUT350::Colors::red);
 }
 
 void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) {

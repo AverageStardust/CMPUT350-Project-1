@@ -11,8 +11,11 @@ Point2D GraphicsObject::GetLocation() const { return {}; }
 float GraphicsObject::GetRotation() const { return 0; }
 
 Transform2D GraphicsObject::GetTransform() const {
+    return transform;
+}
+void GraphicsObject::UpdateTransform() {
     // rotate around origin, then translate
-    return Transform2D::Translation(GetLocation()) * Transform2D::Rotation(GetRotation());
+    transform = Transform2D::Translation(GetLocation()) * Transform2D::Rotation(GetRotation());
 }
 
 }  // namespace CMPUT350

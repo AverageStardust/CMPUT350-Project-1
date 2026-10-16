@@ -13,11 +13,9 @@ struct RGBColor {
     uint8_t r, g, b;
     RGBColor(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
 
-    private:
-        friend class DrawContext;
-        sf::Color const AsSfmlColor() {
-            return sf::Color(r, g, b);
-        }
+private:
+    friend class DrawContext;
+    sf::Color const AsSfmlColor() { return sf::Color(r, g, b); }
 };
 
 namespace Colors {
@@ -50,14 +48,8 @@ public:
 private:
     std::shared_ptr<sf::RenderWindow> mWindow;
     std::shared_ptr<sf::Font> mFont;
-
+    Transform2D transform;
     friend class GameEngine;
-	void SetContextOffset(Point2D p);                                                                   //   TODO
-	void SetContextRotation(float rotation);                                                            //
-	Point2D Transform(Point2D p);                                                                       //
-	Point2D ReverseTransform(Point2D p);                                                                //
-	Rect Transform(Rect r); // Rotates rectangle and computes new bounding box after rotation           //
-
 };
 
 }  // namespace CMPUT350

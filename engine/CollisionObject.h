@@ -31,7 +31,7 @@ class CollisionObject : public GraphicsObject {
 private:
     // global bounds
     Rect bounds;
-    friend void GameEngine::renderObjects(GameContext *context);
+    friend class GameEngine;
 
 public:
     virtual void CollisionEnter(const std::shared_ptr<CollisionObject> &obj) = 0;

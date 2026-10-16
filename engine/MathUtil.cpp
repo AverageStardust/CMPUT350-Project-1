@@ -352,6 +352,17 @@ Rect Transform2D::operator*(const Rect &rect) const {
 Transform2D Transform2D::operator*(const Transform2D &other) const {
     return Transform2D(basis * other.basis, basis * other.origin + origin);
 }
+Point2D &operator*=(Point2D &vector, const Transform2D &transform) {
+    return vector = transform * vector;
+}
+Line &operator*=(Line &line, const Transform2D &transform) { return line = transform * line; }
+Circle &operator*=(Circle &circle, const Transform2D &transform) {
+    return circle = transform * circle;
+}
+Rect &operator*=(Rect &rect, const Transform2D &transform) { return rect = transform * rect; }
+Transform2D &operator*=(Transform2D &other, const Transform2D &transform) {
+    return other = transform * other;
+}
 
 Transform2D Transform2D::Inverse() const { return Transform2D(basis.Inverse(), origin * -1); }
 float Transform2D::Scale() const { return std::hypotf(basis.cells[0], basis.cells[2]); }

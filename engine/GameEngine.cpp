@@ -4,6 +4,7 @@
 
 #include "CollisionObject.h"
 #include "DrawContext.h"
+#include "MathUtil.h"
 #include "SFML/Graphics/Font.hpp"
 
 /// @brief
@@ -28,8 +29,6 @@ GameEngine::~GameEngine() {
     mWindow->close();
 }
 
-
-
 // EngineView functions -------------------------------------------
 
 void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
@@ -43,7 +42,6 @@ void GameEngine::InstallKeyDownNotification(int notifKey, const std::string &not
     // NotifKey is the scancode of the key we want to implement.
     mRegisteredKeys.push_back(notifKey);
     mRegisteredNotifications.push_back(notification);
-
 }
 void GameEngine::InstallKeyUpNotification(int notifKey, const std::string &notification) {
     // Register key with Notification manager for keyup events.
@@ -67,11 +65,9 @@ EngineView::const_iterator GameEngine::end() const { return mGameObjects.end(); 
 
 // ----------------------------------------------------------------
 
-
-
 // Engine loop functions ------------------------------------------
 
-void GameEngine::cleanupDeadGameObjects() {
+void GameEngine::CleanupDeadGameObjects() {
     // Logic copied from Lab 2
     // Apply a filter to remove dead GameObjects
     std::vector<std::shared_ptr<GameObject>> filterResult;
@@ -109,7 +105,7 @@ bool GameEngine::ProcessEvents(GameContext *context) {
     return false;
 }
 
-void GameEngine::processCollisions() {
+void GameEngine::ProcessCollisions() {
     // Check each object against each other object and call CollisionEnter on any objects that
     // intersect
 
@@ -136,43 +132,43 @@ void GameEngine::processCollisions() {
     }
 }
 
-void GameEngine::renderObjects(GameContext *context) {
+void GameEngine::RenderObjects(GameContext *context, bool drawColliders) {
     // Iterate over all GameObjects and render GraphicsObjects to the screen
     // Render objects to the background
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> graphicObj = std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        std::shared_ptr<GraphicsObject> graphicObj =
+            std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
-            context->ScreenContext->SetContextOffset(graphicObj->GetLocation());
-            context->ScreenContext->SetContextRotation(graphicObj->GetRotation());
-
+            // only update transfrom once once, will be the same for later calls
+            context->ScreenContext->transform = graphicObj->GetTransform();
             graphicObj->RenderBackground(context);
         }
     }
 
     // Render objects to the foreground
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> graphicObj = std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        std::shared_ptr<GraphicsObject> graphicObj =
+            std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
-            context->ScreenContext->SetContextOffset(graphicObj->GetLocation());
-            context->ScreenContext->SetContextRotation(graphicObj->GetRotation());
-
+            context->ScreenContext->transform = graphicObj->GetTransform();
             graphicObj->RenderForeground(context);
         }
     }
 
-    // Render colliders
-    for (std::shared_ptr<GameObject> cObj : mGameObjects) {
-        std::shared_ptr<CollisionObject> collisionObj =
-            std::dynamic_pointer_cast<CollisionObject>(cObj);
-        if (collisionObj != nullptr) {
-            context->ScreenContext->FrameRect(collisionObj->bounds, 1, Colors::green);
+    if (drawColliders) {
+        // Render colliders
+        for (std::shared_ptr<GameObject> gObj : mGameObjects) {
+            std::shared_ptr<CollisionObject> collisionObj =
+                std::dynamic_pointer_cast<CollisionObject>(gObj);
+            if (collisionObj != nullptr) {
+                context->ScreenContext->transform = collisionObj->GetTransform();
+                context->ScreenContext->FrameRect(collisionObj->bounds, 1, Colors::green);
+            }
         }
     }
 }
 
 // ----------------------------------------------------------------
-
-
 
 /**
  * @method Run
@@ -181,12 +177,13 @@ void GameEngine::renderObjects(GameContext *context) {
  * all objects have been destroyed.
  */
 void GameEngine::Run() {
-    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont), new DrawContext(mWindow, mFont), mNotificationManager);
+    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont),
+                                           new DrawContext(mWindow, mFont), mNotificationManager);
 
     while (true)  // window is open
     {
         // 0. Remove any objects that are now dead
-        cleanupDeadGameObjects();
+        CleanupDeadGameObjects();
 
         // 1. Activate and initialize any objects added during the last frame
         for (std::shared_ptr<GameObject> gObj : addedGameObjects) {
@@ -204,10 +201,16 @@ void GameEngine::Run() {
         // 3. Update game objects
         for (std::shared_ptr<GameObject> gObj : mGameObjects) {
             gObj->Update(context);
+
+            std::shared_ptr<CollisionObject> collisionObj =
+                std::dynamic_pointer_cast<CollisionObject>(gObj);
+            if (collisionObj != nullptr) {
+                collisionObj->UpdateTransform();
+            }
         }
 
         // 4. Process collision events
-        processCollisions();
+        ProcessCollisions();
 
         // 5. Late updates
         for (std::shared_ptr<GameObject> gObj : mGameObjects) {
@@ -219,7 +222,7 @@ void GameEngine::Run() {
 
         // 6. Render background
         // 7. Render foreground
-        renderObjects(context);
+        RenderObjects(context, false);
 
         // Actually render to window
         mWindow->display();

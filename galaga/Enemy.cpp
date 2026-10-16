@@ -18,16 +18,13 @@ void Enemy::RenderBackground(CMPUT350::GameContext *context) {}
 
 void Enemy::RenderForeground(CMPUT350::GameContext *context) {
     context->ScreenContext->DrawRect(
-        CMPUT350::Rect(location - CMPUT350::Point2D(boundWidth / 2, boundHeight / 2), boundWidth,
+        CMPUT350::Rect(CMPUT350::Point2D(-boundWidth / 2, -boundHeight / 2), boundWidth,
                        boundHeight),
         CMPUT350::Colors::white);
-    context->ScreenContext->DrawLine(location + CMPUT350::Point2D(-20, 15),
-                                     location + CMPUT350::Point2D(20, 15), 5,
+    context->ScreenContext->DrawLine(CMPUT350::Point2D(-20, 15), CMPUT350::Point2D(20, 15), 5,
                                      CMPUT350::Colors::red);
-    context->ScreenContext->DrawCircle(location + CMPUT350::Point2D(-15, -5), 3,
-                                       CMPUT350::Colors::red);
-    context->ScreenContext->DrawCircle(location + CMPUT350::Point2D(15, -5), 3,
-                                       CMPUT350::Colors::red);
+    context->ScreenContext->DrawCircle(CMPUT350::Point2D(-15, -5), 3, CMPUT350::Colors::red);
+    context->ScreenContext->DrawCircle(CMPUT350::Point2D(15, -5), 3, CMPUT350::Colors::red);
 }
 
 void Enemy::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) {}
@@ -38,7 +35,9 @@ bool Enemy::IsAlive() const { return alive; }
 
 CMPUT350::Point2D Enemy::GetLocation() const { return location; };
 
-float Enemy::GetRotation() const { return 0; };
+float Enemy::GetRotation() const {
+    return 0;
+};
 
 const std::vector<CMPUT350::Shape> &Enemy::GetShapes() {
     static std::vector<CMPUT350::Shape> shapes;

@@ -70,9 +70,9 @@ struct Line {
     float Length() const;
     Point2D Lerp(float t) const;
     Point2D ClosestPoint(const Point2D &p) const;
-    bool Intersects(const Line& other, Point2D &point) const;
-    bool Intersects(const Circle& other, Point2D &point) const;
-    bool Intersects(const Rect& other, Point2D &point) const;
+    bool Intersects(const Line &other, Point2D &point) const;
+    bool Intersects(const Circle &other, Point2D &point) const;
+    bool Intersects(const Rect &other, Point2D &point) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Line &l);
@@ -84,9 +84,9 @@ struct Circle {
     Circle(Point2D c = {0, 0}, float r = 0) : center(c), radius(r) {}
     Circle(float x, float y, float r) : center(x, y), radius(r) {}
 
-    bool Intersects(const Line& other, Point2D &point) const;
-    bool Intersects(const Circle& other, Point2D &point) const;
-    bool Intersects(const Rect& other, Point2D &point) const;
+    bool Intersects(const Line &other, Point2D &point) const;
+    bool Intersects(const Circle &other, Point2D &point) const;
+    bool Intersects(const Rect &other, Point2D &point) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Circle &l);
@@ -127,9 +127,9 @@ struct Rect {
     Point2D Size() const;
     Point2D Center() const;
     bool Exists() const;
-    bool Intersects(const Line& other, Point2D &point) const;
-    bool Intersects(const Circle& other, Point2D &point) const;
-    bool Intersects(const Rect& other, Point2D &point) const;
+    bool Intersects(const Line &other, Point2D &point) const;
+    bool Intersects(const Circle &other, Point2D &point) const;
+    bool Intersects(const Rect &other, Point2D &point) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Rect &r);
@@ -175,6 +175,11 @@ struct Transform2D {
     float Rotation() const;
 };
 
+Point2D &operator*=(Point2D &vector, const Transform2D &transform);
+Line &operator*=(Line &line, const Transform2D &transform);
+Circle &operator*=(Circle &circle, const Transform2D &transform);
+Rect &operator*=(Rect &rect, const Transform2D &transform);
+Transform2D &operator*=(Transform2D &other, const Transform2D &transform);
 std::ostream &operator<<(std::ostream &os, const Transform2D &t);
 
 }  // namespace CMPUT350
