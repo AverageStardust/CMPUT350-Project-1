@@ -97,13 +97,9 @@ bool GameEngine::ProcessEvents(GameContext *context) {
             mWindow->setView(sf::View(
                 sf::FloatRect({0.f, 0.f}, {float(resize->size.x), float(resize->size.y)})));
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-            for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-                CallNotification(static_cast<int>(keyPressed->scancode));
-            }
+            CallNotification(1 + static_cast<int>(keyPressed->scancode));
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyReleased>()) {
-            for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-                CallNotification(-1 * static_cast<int>(keyPressed->scancode));
-            }
+            CallNotification(-1 * (1 + static_cast<int>(keyPressed->scancode)));
         }
     }
 

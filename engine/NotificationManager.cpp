@@ -21,17 +21,17 @@ void NotificationManager::Unregister(std::weak_ptr<GameObject> object, const std
 
 void NotificationManager::Notify(const std::string& message) {
     // Notify all GameObjects that have registered for the notification specified by message
-    assert(KeyLocation(message) != mListeners.end());
+    if (KeyLocation(message) != mListeners.end()) {
+        std::vector<std::weak_ptr<GameObject>> registeredObjects = mListeners[message];
 
-    std::vector<std::weak_ptr<GameObject>> registeredObjects = mListeners[message];
-
-    for (std::vector<std::weak_ptr<GameObject>>::iterator i = registeredObjects.begin(); i != registeredObjects.end(); ++i) {
-        auto shared = i->lock();
-        if (shared) {
-            registeredObjects.erase(i);
-        }
-        else {
-            shared->ReceiveNotification(message);
+        for (std::vector<std::weak_ptr<GameObject>>::iterator i = registeredObjects.begin(); i != registeredObjects.end(); ++i) {
+            auto shared = i->lock();
+            if (shared) {
+                registeredObjects.erase(i);
+            }
+            else {
+                shared->ReceiveNotification(message);
+            }
         }
     }
 };
