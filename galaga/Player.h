@@ -43,6 +43,7 @@ private:
     bool alive = true;
 
     CMPUT350::EngineView *mEngineView;
+    std::weak_ptr<CMPUT350::GameObject> ptrToSelf;
 };
 
 #endif
