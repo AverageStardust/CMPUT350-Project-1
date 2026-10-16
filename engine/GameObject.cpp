@@ -9,4 +9,5 @@ void GameObject::RenderUI(GameContext *contextrender) { return; }
 void GameObject::HandleKeyEvent(GameContext *context, int key, bool isPressed) { }
 bool GameObject::IsAlive() const { return true; }
 void GameObject::Kill() {}
+void GameObject::ReceiveNotification(const std::string& key) {}
 }  // namespace CMPUT350

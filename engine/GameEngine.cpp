@@ -28,10 +28,48 @@ GameEngine::~GameEngine() {
     mWindow->close();
 }
 
+
+
+// EngineView functions -------------------------------------------
+
 void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
     // Add the gameObject to our "added" vector to tell the game to activate it
     addedGameObjects.push_back(gameObject);
 }
+
+// Key notifications
+void GameEngine::InstallKeyDownNotification(int notifKey, const std::string &notification) {
+    // Register key with Notification manager for keydown events.
+    // NotifKey is the scancode of the key we want to implement.
+    mRegisteredKeys.push_back(notifKey);
+    mRegisteredNotifications.push_back(notification);
+    
+}
+void GameEngine::InstallKeyUpNotification(int notifKey, const std::string &notification) {
+    // Register key with Notification manager for keyup events.
+    // NotifKey is the scancode of the key we want to implement.
+    mRegisteredKeys.push_back(-notifKey);
+    mRegisteredNotifications.push_back(notification);
+}
+
+void GameEngine::CallNotification(int notifKey) {
+    for (int i = 0; i < mRegisteredKeys.size(); ++i) {
+        if (mRegisteredKeys[i] == notifKey) {
+            mNotificationManager->Notify(mRegisteredNotifications[i]);
+            break;
+        }
+    }
+}
+
+// Iterators
+EngineView::const_iterator GameEngine::begin() const { return mGameObjects.begin(); }
+EngineView::const_iterator GameEngine::end() const { return mGameObjects.end(); }
+
+// ----------------------------------------------------------------
+
+
+
+// Engine loop functions ------------------------------------------
 
 void GameEngine::cleanupDeadGameObjects() {
     // Logic copied from Lab 2
@@ -59,11 +97,11 @@ bool GameEngine::ProcessEvents(GameContext *context) {
                 sf::FloatRect({0.f, 0.f}, {float(resize->size.x), float(resize->size.y)})));
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
             for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-                gObj->HandleKeyEvent(context, char(keyPressed->scancode), true);
+                CallNotification(static_cast<int>(keyPressed->scancode));
             }
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyReleased>()) {
             for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-                gObj->HandleKeyEvent(context, char(keyPressed->scancode), false);
+                CallNotification(-1 * static_cast<int>(keyPressed->scancode));
             }
         }
     }
@@ -102,18 +140,22 @@ void GameEngine::renderObjects(GameContext *context) {
     // Iterate over all GameObjects and render GraphicsObjects to the screen
     // Render objects to the background
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> graphicObj =
-            std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        std::shared_ptr<GraphicsObject> graphicObj = std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
+            context->ScreenContext->SetContextOffset(graphicObj->GetLocation());
+            context->ScreenContext->SetContextRotation(graphicObj->GetRotation());
+
             graphicObj->RenderBackground(context);
         }
     }
 
     // Render objects to the foreground
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> graphicObj =
-            std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        std::shared_ptr<GraphicsObject> graphicObj = std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
+            context->ScreenContext->SetContextOffset(graphicObj->GetLocation());
+            context->ScreenContext->SetContextRotation(graphicObj->GetRotation());
+
             graphicObj->RenderForeground(context);
         }
     }
@@ -128,6 +170,10 @@ void GameEngine::renderObjects(GameContext *context) {
     }
 }
 
+// ----------------------------------------------------------------
+
+
+
 /**
  * @method Run
  * @arguments None
@@ -135,7 +181,7 @@ void GameEngine::renderObjects(GameContext *context) {
  * all objects have been destroyed.
  */
 void GameEngine::Run() {
-    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont));
+    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont), new DrawContext(mWindow, mFont), mNotificationManager);
 
     while (true)  // window is open
     {
