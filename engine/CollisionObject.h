@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include "GraphicsObject.h"
 #include "GameEngine.h"
+#include "GraphicsObject.h"
 #include "MathUtil.h"
 
 namespace CMPUT350 {
@@ -19,6 +19,7 @@ union ShapeUnion {
     Circle circle;
     Rect rect;  // Axis-aligned rectangle
 };
+
 struct Shape {
     Shape(const Line &l) : shape(l), t(ShapeType::kLine) {}
     Shape(const Circle &c) : shape(c), t(ShapeType::kCircle) {}
@@ -27,20 +28,31 @@ struct Shape {
     ShapeType t;
 };
 
+struct Collision {
+    bool isColliding;
+    Point2D point;
+
+    Collision() : isColliding(false) {};
+    Collision(Point2D point) : isColliding(true), point(point) {};
+};
+
 class CollisionObject : public GraphicsObject {
 private:
     // global bounds
     Rect bounds;
+    std::vector<Shape> shapes;
     friend class GameEngine;
 
 public:
     virtual void CollisionEnter(const std::shared_ptr<CollisionObject> &obj) = 0;
-    virtual void CollisionEnter(const std::shared_ptr<CollisionObject> &obj, const Point2D &collisionPoint)
-	{ CollisionEnter(obj); }
+    virtual void CollisionEnter(const std::shared_ptr<CollisionObject> &obj,
+                                const Point2D &collisionPoint) {
+        CollisionEnter(obj);
+    }
 
-	// calls GetShapes and generates a bounding box for itself
-    void UpdateBounds();
-    bool CheckCollision(CollisionObject &other);
+    // calls GetShapes and generates a bounding box for itself
+    void UpdateCollider();
+    Collision CheckCollision(CollisionObject &other);
 
     // Return the internal shapes in the object. Shapes can be:
     // lines, points/circles, or axis-aligned rectangles

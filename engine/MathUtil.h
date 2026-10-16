@@ -127,6 +127,7 @@ struct Rect {
     void Inset(int inset);
     Rect Inseted(int inset) const;
     bool IsInside(const Point2D &p) const;
+    bool IsOverlapping(const Rect &rect) const;
     float Width() const;
     float Height() const;
     Point2D Size() const;

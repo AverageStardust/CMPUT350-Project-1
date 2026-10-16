@@ -308,6 +308,9 @@ Rect Rect::Inseted(int inset) const {
 bool Rect::IsInside(const Point2D &p) const {
     return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
 }
+bool Rect::IsOverlapping(const Rect &rect) const {
+    return (*this & rect).Exists();
+}
 float Rect::Width() const {
     if (!Exists()) return 0;
     return bottomRight.x - topLeft.x;

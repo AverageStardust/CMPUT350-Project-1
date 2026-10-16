@@ -117,16 +117,16 @@ void GameEngine::ProcessCollisions() {
 
         if (collider != nullptr) {
             colliders.push_back(collider);
-            collider->UpdateBounds();
+            collider->UpdateCollider();
         }
     }
 
     for (int i = 0; i < colliders.size(); i++) {
         for (int j = i + 1; j < colliders.size(); j++) {
-            bool isColliding = colliders[i]->CheckCollision(*colliders[j]);
-            if (isColliding) {
-                colliders[i]->CollisionEnter(colliders[j]);
-                colliders[j]->CollisionEnter(colliders[i]);
+            Collision colliding = colliders[i]->CheckCollision(*colliders[j]);
+            if (colliding.isColliding) {
+                colliders[i]->CollisionEnter(colliders[j], colliding.point);
+                colliders[j]->CollisionEnter(colliders[i], colliding.point);
             }
         }
     }
