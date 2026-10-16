@@ -1,7 +1,6 @@
 #ifndef MATHUTIL_H
 #define MATHUTIL_H
 
-#include <cmath>
 #include <iostream>
 
 #include "SFML/System/Vector2.hpp"
@@ -13,88 +12,51 @@ struct Point2D {
 
     Point2D(float x = 0, float y = 0) : x(x), y(y) {}
 
-    Point2D operator+(const Point2D &other) const { return Point2D(x + other.x, y + other.y); }
-    Point2D operator+(const float &scalar) const { return Point2D(x + scalar, y + scalar); }
-    Point2D operator-(const Point2D &other) const { return Point2D(x - other.x, y - other.y); }
-    Point2D operator-(const float &scalar) const { return Point2D(x - scalar, y - scalar); }
-    Point2D operator*(const float &scalar) const { return Point2D(x * scalar, y * scalar); }
-    Point2D operator/(const float &scalar) const { return Point2D(x / scalar, y / scalar); }
-    float operator*(const Point2D &other) const { return x * other.x + y * other.y; }
-    bool operator==(const Point2D &other) const { return x == other.x && y == other.y; }
-    bool operator<(const Point2D &other) const { return x < other.x && y < other.y; }
-    bool operator>(const Point2D &other) const { return x > other.x && y > other.y; }
-    bool operator<=(const Point2D &other) const { return x <= other.x && y <= other.y; }
-    bool operator>=(const Point2D &other) const { return x >= other.x && y >= other.y; }
+    Point2D operator+(const Point2D &other) const;
+    Point2D operator+(const float &scalar) const;
+    Point2D operator-(const Point2D &other) const;
+    Point2D operator-(const float &scalar) const;
+    Point2D operator*(const float &scalar) const;
+    Point2D operator/(const float &scalar) const;
+    float operator*(const Point2D &other) const;
+    bool operator==(const Point2D &other) const;
+    bool operator<(const Point2D &other) const;
+    bool operator>(const Point2D &other) const;
+    bool operator<=(const Point2D &other) const;
+    bool operator>=(const Point2D &other) const;
 
-    Point2D &operator+=(const Point2D &other) {
-        x += other.x;
-        y += other.y;
-        return *this;
-    }
-    Point2D &operator+=(const float &scalar) {
-        x += scalar;
-        y += scalar;
-        return *this;
-    }
-    Point2D &operator-=(const Point2D &other) {
-        x -= other.x;
-        y -= other.y;
-        return *this;
-    }
-    Point2D &operator-=(const float &scalar) {
-        x -= scalar;
-        y -= scalar;
-        return *this;
-    }
-    Point2D &operator*=(const float &scalar) {
-        x *= scalar;
-        y *= scalar;
-        return *this;
-    }
-    Point2D &operator/=(const float &scalar) {
-        x /= scalar;
-        y /= scalar;
-        return *this;
-    }
+    Point2D &operator+=(const Point2D &other);
+    Point2D &operator+=(const float &scalar);
+    Point2D &operator-=(const Point2D &other);
+    Point2D &operator-=(const float &scalar);
+    Point2D &operator*=(const float &scalar);
+    Point2D &operator/=(const float &scalar);
 
-    Point2D Min(Point2D other) const { return Point2D(fmin(x, other.x), fmin(y, other.y)); }
-    Point2D Max(Point2D other) const { return Point2D(fmax(x, other.x), fmax(y, other.y)); }
-    float Dot(Point2D other) const { return x * other.x + y * other.y; }
-    float Cross(Point2D other) const { return x * other.y - y * other.x; }
-    float Distance(const Point2D &other) const { return hypotf(x - other.x, y - other.y); }
-    void Normalize() { *this /= this->Length(); }
-    Point2D Normalized() const { return *this / this->Length(); }
-    void Rotate(float thetaRadians) {
-        float sinTheta = sinf(thetaRadians);
-        float cosTheta = cosf(thetaRadians);
-        float tempX = x;
-        x = x * cosTheta - y * sinTheta;
-        y = tempX * sinTheta + y * cosTheta;
-    }
-    Point2D Rotated(float thetaRadians) const {
-        float sinTheta = sinf(thetaRadians);
-        float cosTheta = cosf(thetaRadians);
-        return Point2D(x * cosTheta - y * sinTheta, x * sinTheta + y * cosTheta);
-    }
-    Point2D Perpendicular() const { return Point2D(-y, x); }
-    float Length() const { return hypot(x, y); }
-    float LengthSq() const { return x * x + y * y; }
-    static float Dot(Point2D a, Point2D b) { return a.x * b.x + a.y * b.y; }
-    static float Cross(Point2D a, Point2D b) { return a.x * b.y - a.y * b.x; }
+    Point2D Min(Point2D other) const;
+    Point2D Max(Point2D other) const;
+    float Dot(Point2D other) const;
+    float Cross(Point2D other) const;
+    float Distance(const Point2D &other) const;
+    void Normalize();
+    Point2D Normalized() const;
+    void Rotate(float thetaRadians);
+    Point2D Rotated(float thetaRadians) const;
+    Point2D Perpendicular() const;
+    float Length() const;
+    float LengthSq() const;
+    static float Dot(Point2D a, Point2D b);
+    static float Cross(Point2D a, Point2D b);
 
 private:
     friend class DrawContext;
-    sf::Vector2f AsSfmlVector() const { return sf::Vector2f(x, y); }
+    sf::Vector2f AsSfmlVector() const;
 };
 
-static std::ostream &operator<<(std::ostream &os, const Point2D &p) {
-    os << "(" << p.x << ", " << p.y << ")";
-    return os;
-}
+std::ostream &operator<<(std::ostream &os, const Point2D &p);
+Point2D operator*(float scalar, const Point2D &point);
 
-static Point2D operator*(float scalar, const Point2D &point) {
-    return Point2D(scalar * point.x, scalar * point.y);
-}
+struct Circle;
+struct Rect;
 
 struct Line {
     Point2D p1, p2;
@@ -102,33 +64,26 @@ struct Line {
     Line(Point2D p1 = {0, 0}, Point2D p2 = {0, 0}) : p1(p1), p2(p2) {}
     Line(float x1, float y1, float x2, float y2) : p1(x1, y1), p2(x2, y2) {}
 
-    float Length() const { return p1.Distance(p2); }
-    Point2D ClosestPoint(const Point2D &p) const {
-        Point2D diff = p2 - p1;
-        float t = (p - p1).Dot(diff) / diff.LengthSq();
-        t = fmax(t, fmin(t, 1));  // clamp
-        return p1 + diff * t;
-    }
-    bool IsOnLeftSide(const Point2D &p) const { return (p1 - p).Cross(p2 - p) < 0; }
-    bool Crosses(Line other, Point2D &crossingPoint) const {
-        bool crossesForThis = IsOnLeftSide(other.p1) != IsOnLeftSide(other.p2);
-        bool crossesForOther = other.IsOnLeftSide(p1) != other.IsOnLeftSide(p2);
-        return crossesForThis && crossesForOther;
-    }
+    float Length() const;
+    Point2D ClosestPoint(const Point2D &p) const;
+    bool IsOnLeftSide(const Point2D &p) const;
+    bool Intersects(const Line& other, Point2D &point) const;
+    bool Intersects(const Circle& other, Point2D &point) const;
+    bool Intersects(const Rect& other, Point2D &point) const;
 };
 
-static std::ostream &operator<<(std::ostream &os, const Line &l) {
-    os << "(" << l.p1 << ", " << l.p2 << ")";
-    return os;
-}
+std::ostream &operator<<(std::ostream &os, const Line &l);
 
 struct Circle {
     Point2D center;
     float radius;
 
     Circle(Point2D c = {0, 0}, float r = 0) : center(c), radius(r) {}
-
     Circle(float x, float y, float r) : center(x, y), radius(r) {}
+
+    bool Intersects(const Line& other, Point2D &point) const;
+    bool Intersects(const Circle& other, Point2D &point) const;
+    bool Intersects(const Rect& other, Point2D &point) const;
 };
 
 struct Rect {
@@ -136,126 +91,43 @@ struct Rect {
     Point2D bottomRight;
 
     Rect() : topLeft({0, 0}), bottomRight({-1, -1}) {}
-    Rect(float left, float top, float width, float height)
+    Rect(float left, float top, float width = 0, float height = 0)
         : topLeft(Point2D(left, top)), bottomRight(Point2D(left + width, top + height)) {}
-    Rect(Point2D tl, int w, int h) : topLeft(tl), bottomRight(tl + Point2D(w, h)) {}
+    Rect(Point2D tl, int w = 0, int h = 0) : topLeft(tl), bottomRight(tl + Point2D(w, h)) {}
+
     // Creates bounding box around p1 and p2 with positive width/height
     Rect(Point2D p1, Point2D p2) : topLeft(p1.Min(p2)), bottomRight(p1.Max(p2)) {}
     Rect(Point2D center, float radius)
         : topLeft(center.x - radius), bottomRight(center.x + radius) {}
-    Rect(Point2D point) : topLeft(point), bottomRight(point) {}
+
     Rect(Circle circle)
         : topLeft(circle.center - circle.radius), bottomRight(circle.center + circle.radius) {}
     Rect(Line line) : topLeft(line.p1.Min(line.p2)), bottomRight(line.p1.Max(line.p2)) {}
 
-    Rect operator|(const Point2D &other) const {
-        if (Exists()) {
-            Rect result;
-            result.topLeft = topLeft.Min(other);
-            result.bottomRight = bottomRight.Max(other);
-            return result;
-        } else {
-            return Rect(other);
-        }
-    }
+    Rect operator|(const Point2D &other) const;
+    Rect operator|(const Rect &other) const;
+    Rect operator|(const Line &other) const;
+    Rect operator&(const Rect &other) const;
 
-    Rect operator|(const Rect &other) const {
-        if (!other.Exists()) return *this;
+    Rect &operator|=(const Point2D &other);
+    Rect &operator|=(const Rect &other);
+    Rect &operator|=(const Line &other);
+    Rect &operator&=(const Rect &other);
 
-        return *this | other.topLeft | other.bottomRight;
-    }
-
-    Rect operator|(const Line &other) const {
-        return *this | other.p1 | other.p2;
-    }
-
-    Rect operator&(const Rect &other) const {
-        if (Exists() && other.Exists()) {
-            Rect result;
-            result.topLeft = topLeft.Max(other.topLeft);
-            result.bottomRight = bottomRight.Min(other.bottomRight);
-            return result;
-        } else {
-            return {};
-        }
-    }
-
-    Rect &operator|=(const Point2D &other) {
-        if (Exists()) {
-            topLeft = topLeft.Min(other);
-            bottomRight = bottomRight.Max(other);
-        } else {
-            topLeft = other;
-            bottomRight = other;
-        }
-
-        return *this;
-    }
-
-    Rect &operator|=(const Rect &other) {
-        if (other.Exists()) {
-            *this |= other.topLeft;
-            *this |= other.bottomRight;
-        }
-
-        return *this;
-    }
-
-    Rect &operator|=(const Line &other) {
-        *this |= other.p1;
-        *this |= other.p2;
-        return *this;
-    }
-
-    Rect &operator&=(const Rect &other) {
-        if (!Exists()) return *this;
-        if (!other.Exists()) {
-            return *this = {};
-        }
-
-        topLeft = topLeft.Max(other.topLeft);
-        bottomRight = bottomRight.Min(other.bottomRight);
-
-        return *this;
-    }
-
-    void Inset(int inset) {
-        topLeft += inset;
-        bottomRight -= inset;
-    }
-
-    Rect Inseted(int inset) const {
-        Rect result;
-        result.topLeft = topLeft + inset;
-        result.bottomRight = topLeft - inset;
-        return result;
-    }
-
-    bool IsIntersecting(const Rect &p) const { return (*this & p).Exists(); }
-    bool IsInside(const Point2D &p) const {
-        return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
-    }
-    float Width() const {
-        if (!Exists()) return 0;
-        return bottomRight.x - topLeft.x;
-    }
-    float Height() const {
-        if (!Exists()) return 0;
-        return bottomRight.y - topLeft.y;
-    }
-    Point2D Size() const {
-        if (!Exists()) return {};
-        return bottomRight - topLeft;
-    }
-    bool Exists() const {
-        return bottomRight >= topLeft;
-    }
+    void Inset(int inset);
+    Rect Inseted(int inset) const;
+    bool IsInside(const Point2D &p) const;
+    float Width() const;
+    float Height() const;
+    Point2D Size() const;
+    Point2D Center() const;
+    bool Exists() const;
+    bool Intersects(const Line& other, Point2D &point) const;
+    bool Intersects(const Circle& other, Point2D &point) const;
+    bool Intersects(const Rect& other, Point2D &point) const;
 };
 
-static std::ostream &operator<<(std::ostream &os, const Rect &r) {
-    os << "(" << r.topLeft << ", " << r.bottomRight << ")";
-    return os;
-}
+std::ostream &operator<<(std::ostream &os, const Rect &r);
 
 // 2x2 matrix
 struct Matrix2 {
@@ -263,36 +135,17 @@ struct Matrix2 {
 
     Matrix2() : cells{1.0, 0.0, 0.0, 1.0} {}
     Matrix2(float a, float b, float c, float d) : cells{a, b, c, d} {}
-    Matrix2(float (&&basis)[4]) { std::copy(basis, basis + 4, this->cells); }
+    Matrix2(float (&&basis)[4]);
 
-    Matrix2 operator*(const float &scalar) const {
-        return Matrix2(cells[0] * scalar, cells[1] * scalar, cells[2] * scalar, cells[3] * scalar);
-    }
+    Matrix2 operator*(const float &scalar) const;
+    Point2D operator*(const Point2D &vector) const;
+    Matrix2 operator*(const Matrix2 &other) const;
 
-    Point2D operator*(const Point2D &vector) const {
-        return Point2D(cells[0] * vector.x + cells[1] * vector.y,
-                       cells[2] * vector.x + cells[3] * vector.y);
-    }
-
-    Matrix2 operator*(const Matrix2 &other) const {
-        return Matrix2(cells[0] * other.cells[0] + cells[1] * other.cells[2],
-                       cells[0] * other.cells[1] + cells[1] * other.cells[3],
-                       cells[2] * other.cells[0] + cells[3] * other.cells[2],
-                       cells[2] * other.cells[1] + cells[3] * other.cells[3]);
-    }
-
-    float Determinant() const { return cells[0] * cells[3] - cells[1] * cells[2]; }
-
-    Matrix2 Inverse() const {
-        float determinant = Determinant();
-        return Matrix2(cells[3], -cells[1], -cells[2], cells[0]) * (1 / determinant);
-    }
+    float Determinant() const;
+    Matrix2 Inverse() const;
 };
 
-static std::ostream &operator<<(std::ostream &os, const Matrix2 &m) {
-    os << "(" << m.cells << ")";
-    return os;
-}
+std::ostream &operator<<(std::ostream &os, const Matrix2 &m);
 
 // Augmented 2x2 matrix representing 2d transformations
 struct Transform2D {
@@ -301,43 +154,19 @@ struct Transform2D {
 
     Transform2D(Matrix2 basis = {}, Point2D origin = {}) : basis{basis}, origin{origin} {}
 
-    static Transform2D Rotation(float angle) {
-        float cosAngle = std::cos(angle);
-        float sinAngle = std::sin(angle);
-        return Transform2D(Matrix2(cosAngle, -sinAngle, sinAngle, cosAngle), {});
-    }
-    static Transform2D Translation(Point2D offset) { return Transform2D({}, offset); }
-    static Transform2D Scale(float factor) { return Transform2D({factor, 0.0, 0.0, factor}, {}); }
+    static Transform2D Rotation(float angle);
+    static Transform2D Translation(Point2D offset);
+    static Transform2D Scale(float factor);
 
-    Point2D operator*(const Point2D &vector) const { return basis * vector + origin; }
-
-    Line operator*(const Line &line) const { return Line(*this * line.p1, *this * line.p2); }
-
-    // assumes uniform scaling
-    Circle operator*(const Circle &circle) const {
-        float scalingFactor = hypotf(basis.cells[0], basis.cells[2]);
-        return Circle(circle.center, circle.radius * scalingFactor);
-    }
-
-    Rect operator*(const Rect &rect) const {
-        Point2D p0 = *this * rect.topLeft;
-        Point2D p1 = *this * Point2D(rect.topLeft.x, rect.bottomRight.y);
-        Point2D p2 = *this * rect.bottomRight;
-        Point2D p3 = *this * Point2D(rect.bottomRight.x, rect.topLeft.y);
-        return Rect(p0, p1) | p2 | p3;
-    }
-
-    Transform2D operator*(const Transform2D &other) const {
-        return Transform2D(basis * other.basis, basis * other.origin + origin);
-    }
-
-    Transform2D Inverse() const { return Transform2D(basis.Inverse(), origin * -1); }
+    Point2D operator*(const Point2D &vector) const;
+    Line operator*(const Line &line) const;
+    Circle operator*(const Circle &circle) const;
+    Rect operator*(const Rect &rect) const;
+    Transform2D operator*(const Transform2D &other) const;
+    Transform2D Inverse() const;
 };
 
-static std::ostream &operator<<(std::ostream &os, const Transform2D &t) {
-    os << "(" << t.basis << ", " << t.basis << ")";
-    return os;
-}
+std::ostream &operator<<(std::ostream &os, const Transform2D &t);
 
 }  // namespace CMPUT350
 
