@@ -55,6 +55,9 @@ private:
 std::ostream &operator<<(std::ostream &os, const Point2D &p);
 Point2D operator*(float scalar, const Point2D &point);
 
+struct Circle;
+struct Rect;
+
 struct Line {
     Point2D p1, p2;
 
@@ -64,7 +67,9 @@ struct Line {
     float Length() const;
     Point2D ClosestPoint(const Point2D &p) const;
     bool IsOnLeftSide(const Point2D &p) const;
-    bool Crosses(Line other, Point2D &crossingPoint) const;
+    bool Intersects(const Line& other, Point2D &point) const;
+    bool Intersects(const Circle& other, Point2D &point) const;
+    bool Intersects(const Rect& other, Point2D &point) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Line &l);
@@ -75,6 +80,10 @@ struct Circle {
 
     Circle(Point2D c = {0, 0}, float r = 0) : center(c), radius(r) {}
     Circle(float x, float y, float r) : center(x, y), radius(r) {}
+
+    bool Intersects(const Line& other, Point2D &point) const;
+    bool Intersects(const Circle& other, Point2D &point) const;
+    bool Intersects(const Rect& other, Point2D &point) const;
 };
 
 struct Rect {
@@ -107,12 +116,15 @@ struct Rect {
 
     void Inset(int inset);
     Rect Inseted(int inset) const;
-    bool IsIntersecting(const Rect &p) const;
     bool IsInside(const Point2D &p) const;
     float Width() const;
     float Height() const;
     Point2D Size() const;
+    Point2D Center() const;
     bool Exists() const;
+    bool Intersects(const Line& other, Point2D &point) const;
+    bool Intersects(const Circle& other, Point2D &point) const;
+    bool Intersects(const Rect& other, Point2D &point) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Rect &r);

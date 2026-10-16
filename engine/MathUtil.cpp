@@ -91,11 +91,20 @@ Point2D Line::ClosestPoint(const Point2D &p) const {
     return p1 + diff * t;
 }
 bool Line::IsOnLeftSide(const Point2D &p) const { return (p1 - p).Cross(p2 - p) < 0; }
-bool Line::Crosses(Line other, Point2D &crossingPoint) const {  // TODO
-    bool crossesForThis = IsOnLeftSide(other.p1) != IsOnLeftSide(other.p2);
-    bool crossesForOther = other.IsOnLeftSide(p1) != other.IsOnLeftSide(p2);
-    return crossesForThis && crossesForOther;
-}
+// bool Line::Intersects(const Line &other, Point2D &point) const {
+//     float determinant = (p2 - p1).Cross(other.p2 - other.p1);
+
+//     if (determinant == 0)
+//         return false;
+
+//     float t = (other.p1 - p1).Cross(other.p2 - other.p1) / determinant;
+
+
+//     (p1+(p2-p1) * t).Distance(other.p1) /
+//     dist(p1+(p2-p1) * t, P) / |P->|
+
+//     return;
+// }
 
 std::ostream &operator<<(std::ostream &os, const Line &l) {
     os << "(" << l.p1 << ", " << l.p2 << ")";
@@ -174,7 +183,6 @@ Rect Rect::Inseted(int inset) const {
     result.bottomRight = topLeft - inset;
     return result;
 }
-bool Rect::IsIntersecting(const Rect &p) const { return (*this & p).Exists(); }
 bool Rect::IsInside(const Point2D &p) const {
     return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
 }
@@ -190,7 +198,21 @@ Point2D Rect::Size() const {
     if (!Exists()) return {};
     return bottomRight - topLeft;
 }
+Point2D Rect::Center() const {
+    if (!Exists()) return {};
+    return (bottomRight + topLeft) / 2.0;
+}
 bool Rect::Exists() const { return bottomRight >= topLeft; }
+
+bool Rect::Intersects(const Rect &p, Point2D &point) const {
+    Rect intersection = *this & p;
+    bool intersects = intersection.Exists();
+
+    if (intersects)
+        point = intersection.Center();
+
+    return intersects;
+}
 
 std::ostream &operator<<(std::ostream &os, const Rect &r) {
     os << "(" << r.topLeft << ", " << r.bottomRight << ")";
@@ -216,6 +238,7 @@ Matrix2 Matrix2::operator*(const Matrix2 &other) const {
 float Matrix2::Determinant() const { return cells[0] * cells[3] - cells[1] * cells[2]; }
 Matrix2 Matrix2::Inverse() const {
     float determinant = Determinant();
+    assert(determinant != 0);
     return Matrix2(cells[3], -cells[1], -cells[2], cells[0]) * (1 / determinant);
 }
 
