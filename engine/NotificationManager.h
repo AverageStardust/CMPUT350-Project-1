@@ -1,6 +1,9 @@
 #ifndef NOTIFICATIONMANAGER_H
 #define NOTIFICATIONMANAGER_H
 
+#include <unordered_map>
+#include "EngineView.h"
+
 namespace CMPUT350 {
 
 class NotificationManager {
