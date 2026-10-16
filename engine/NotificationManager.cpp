@@ -3,6 +3,7 @@
 namespace CMPUT350 {
 
 void NotificationManager::Register(std::weak_ptr<GameObject> object, const std::string& key) {
+    // If the key already exists, add the GameObject to it. If not, add a new key to the mapping
     if (KeyLocation(key) == mListeners.end()) {
         mListeners.insert({key, std::vector<std::weak_ptr<GameObject>>{object}});
     }
@@ -12,12 +13,14 @@ void NotificationManager::Register(std::weak_ptr<GameObject> object, const std::
 }
 
 void NotificationManager::Unregister(std::weak_ptr<GameObject> object, const std::string& key) {
+    // Check that the key exists, then erase it
     assert(KeyLocation(key) != mListeners.end());
 
     mListeners.erase(key);
 }
 
 void NotificationManager::Notify(const std::string& message) {
+    // Notify all GameObjects that have registered for the notification specified by message
     assert(KeyLocation(message) != mListeners.end());
 
     std::vector<std::weak_ptr<GameObject>> registeredObjects = mListeners[message];

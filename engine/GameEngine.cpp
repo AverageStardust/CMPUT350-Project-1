@@ -53,6 +53,7 @@ void GameEngine::InstallKeyUpNotification(int notifKey, const std::string &notif
 }
 
 void GameEngine::CallNotification(int notifKey) {
+    // Tells NotificationManager to notify all GameObjects registered for notifkey
     for (int i = 0; i < mRegisteredKeys.size(); ++i) {
         if (mRegisteredKeys[i] == notifKey) {
             mNotificationManager->Notify(mRegisteredNotifications[i]);
@@ -109,7 +110,7 @@ bool GameEngine::ProcessEvents(GameContext *context) {
     return false;
 }
 
-void GameEngine::processCollisions() {
+void GameEngine::processCollisions() {                                                              // TODO: Update with new collision checking
     // Check each object against each other object and call CollisionEnter on any objects that
     // intersect
 
