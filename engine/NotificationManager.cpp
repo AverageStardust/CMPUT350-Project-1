@@ -1,5 +1,4 @@
 #include "NotificationManager.h"
-#include <iostream>
 
 namespace CMPUT350 {
 void NotificationManager::Register(std::weak_ptr<GameObject> object,
