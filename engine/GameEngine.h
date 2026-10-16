@@ -33,7 +33,7 @@ public:
     void AddGameObject(std::shared_ptr<GameObject> gameObject) override;
     void InstallKeyDownNotification(int, const std::string &notification) override;
     void InstallKeyUpNotification(int, const std::string &notification) override;
-    void CallNotification(int);
+    void NotifyForInstalledKey(int);
 
     bool ProcessEvents(GameContext *context);
     void CleanupDeadGameObjects();
@@ -53,10 +53,11 @@ private:
         addedGameObjects;  // Newly added objects that will be activated on the next frame
 
     // Notification manager (the vectors are mapped to one another)
-    std::shared_ptr<CMPUT350::NotificationManager> mNotificationManager;
-    std::vector<int> mRegisteredKeys;  // Positive ints are for keydown events, negative ints are
-                                       // for keyup events
-    std::vector<std::string> mRegisteredNotifications;
+
+    NotificationManager *mNotificationManager = new NotificationManager();
+    std::vector<int> mRegisteredKeys =
+        {};  // Positive ints are for keydown events, negative ints are for keyup events
+    std::vector<std::string> mRegisteredNotifications = {};
 };
 
 }  // namespace CMPUT350

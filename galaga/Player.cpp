@@ -9,6 +9,15 @@ Player::Player(CMPUT350::Point2D location) : location(location) {}
 void Player::Initialize(CMPUT350::GameContext *context) {
     boundWidth = 40.0f;
     boundHeight = 40.0f;
+
+    mEngineView = context->mEngineView;
+
+    // Sign up for key press notifications
+    context->mNotificationManager->Register(context->CurrObject, "shoot");
+    context->mNotificationManager->Register(context->CurrObject, "move_left");
+    context->mNotificationManager->Register(context->CurrObject, "stop_left");
+    context->mNotificationManager->Register(context->CurrObject, "move_right");
+    context->mNotificationManager->Register(context->CurrObject, "stop_right");
 }
 
 void Player::Update(CMPUT350::GameContext *context) {
@@ -21,7 +30,7 @@ void Player::Update(CMPUT350::GameContext *context) {
 
 void Player::LateUpdate(CMPUT350::GameContext *context) {}
 
-void Player::HandleKeyEvent(CMPUT350::GameContext *context, int key, bool isPressed) {
+/*void Player::HandleKeyEvent(CMPUT350::GameContext *context, int key, bool isPressed) {
     switch (key) {
         case CMPUT350::Key::A:
             isLeftPressed = isPressed;
@@ -43,6 +52,28 @@ void Player::HandleKeyEvent(CMPUT350::GameContext *context, int key, bool isPres
             }
 
             break;
+    }
+}*/
+void Player::ReceiveNotification(const std::string &notification) {
+    // Handle key presses
+    if (notification == "move_left") {
+        isLeftPressed = true;
+    } else if (notification == "stop_left") {
+        isLeftPressed = false;
+    } else if (notification == "move_right") {
+        isRightPressed = true;
+    } else if (notification == "stop_right") {
+        isRightPressed = false;
+    } else if (notification == "shoot") {
+        bullets.remove_if([](std::weak_ptr<Bullet> bullet) { return bullet.expired(); });
+        int size = distance(bullets.begin(), bullets.end());  // yuck
+
+        if (size < 2) {
+            std::shared_ptr<Bullet> bullet =
+                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -20), true);
+            mEngineView->AddGameObject(bullet);
+            bullets.push_front(bullet);
+        }
     }
 }
 

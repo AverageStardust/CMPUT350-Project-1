@@ -18,9 +18,9 @@ public:
     void Initialize(CMPUT350::GameContext *context) override;
     void Update(CMPUT350::GameContext *context) override;
     void LateUpdate(CMPUT350::GameContext *context) override;
-    void HandleKeyEvent(CMPUT350::GameContext *context, int key, bool isPressed) override;
     bool IsAlive() const override;
     void Kill() override;
+    void ReceiveNotification(const std::string& notification) override;
 
     // Graphics Object Functions
     void RenderForeground(CMPUT350::GameContext *context) override;
@@ -41,6 +41,8 @@ private:
     float boundWidth;
     float boundHeight;
     bool alive = true;
+
+    CMPUT350::EngineView *mEngineView;
 };
 
 #endif

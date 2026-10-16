@@ -1,8 +1,9 @@
 #ifndef NOTIFICATIONMANAGER_H
 #define NOTIFICATIONMANAGER_H
 
+#include <set>
 #include <unordered_map>
-#include <cassert>
+
 #include "EngineView.h"
 #include "GameObject.h"
 
@@ -10,13 +11,16 @@ namespace CMPUT350 {
 
 class NotificationManager {
 public:
-    void Register(std::weak_ptr<GameObject> object, const std::string& key);
-    void Unregister(std::weak_ptr<GameObject> object, const std::string& key);
-    void Notify(const std::string& message);
+    bool IsRegistered(std::weak_ptr<GameObject> object, const std::string &key);
+    void Register(std::weak_ptr<GameObject> object, const std::string &key);
+    void Unregister(std::weak_ptr<GameObject> object, const std::string &key);
+    void Notify(const std::string &message);
 
-    auto KeyLocation(const std::string& key) { return mListeners.find(key); }
 private:
-    std::unordered_map<std::string, std::vector<std::weak_ptr<GameObject>>> mListeners;
+    std::unordered_map<std::string, std::set<std::weak_ptr<GameObject>, std::owner_less<>>> mListeners = {};
+    void Clean();
+
+    //friend class GameEngine;
 };
 
 }  // namespace CMPUT350

@@ -11,7 +11,7 @@ namespace CMPUT350 {
 class GameContext {
 public:
     GameContext(EngineView *mEngineView, DrawContext *ScreenContext, DrawContext *GUIContext,
-                std::shared_ptr<NotificationManager> mNotificationManager)
+                NotificationManager *mNotificationManager)
         : mEngineView(mEngineView),
           ScreenContext(ScreenContext),
           GUIContext(GUIContext),
@@ -21,7 +21,7 @@ public:
     DrawContext *ScreenContext;
     DrawContext *GUIContext;
     std::weak_ptr<GameObject> CurrObject;
-    std::shared_ptr<NotificationManager> mNotificationManager;
+    NotificationManager *mNotificationManager;
     int currentFrame;
 };
 
