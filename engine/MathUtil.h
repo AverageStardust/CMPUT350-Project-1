@@ -34,9 +34,12 @@ struct Point2D {
 
     Point2D Min(Point2D other) const;
     Point2D Max(Point2D other) const;
+    Point2D Abs() const;
+    Point2D Sign() const;
     float Dot(Point2D other) const;
     float Cross(Point2D other) const;
     float Distance(const Point2D &other) const;
+    float DistanceSq(const Point2D &other) const;
     void Normalize();
     Point2D Normalized() const;
     void Rotate(float thetaRadians);
@@ -65,8 +68,8 @@ struct Line {
     Line(float x1, float y1, float x2, float y2) : p1(x1, y1), p2(x2, y2) {}
 
     float Length() const;
+    Point2D Lerp(float t) const;
     Point2D ClosestPoint(const Point2D &p) const;
-    bool IsOnLeftSide(const Point2D &p) const;
     bool Intersects(const Line& other, Point2D &point) const;
     bool Intersects(const Circle& other, Point2D &point) const;
     bool Intersects(const Rect& other, Point2D &point) const;
@@ -85,6 +88,8 @@ struct Circle {
     bool Intersects(const Circle& other, Point2D &point) const;
     bool Intersects(const Rect& other, Point2D &point) const;
 };
+
+std::ostream &operator<<(std::ostream &os, const Circle &l);
 
 struct Rect {
     Point2D topLeft;

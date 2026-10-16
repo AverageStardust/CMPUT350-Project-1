@@ -43,7 +43,7 @@ void GameEngine::InstallKeyDownNotification(int notifKey, const std::string &not
     // NotifKey is the scancode of the key we want to implement.
     mRegisteredKeys.push_back(notifKey);
     mRegisteredNotifications.push_back(notification);
-    
+
 }
 void GameEngine::InstallKeyUpNotification(int notifKey, const std::string &notification) {
     // Register key with Notification manager for keyup events.
