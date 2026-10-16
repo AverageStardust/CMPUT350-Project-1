@@ -44,7 +44,7 @@ private:
     friend class GameEngine;
 
 public:
-    virtual void CollisionEnter(const std::shared_ptr<CollisionObject> &obj) = 0;
+    virtual void CollisionEnter(const std::shared_ptr<CollisionObject> &obj) {};
     virtual void CollisionEnter(const std::shared_ptr<CollisionObject> &obj,
                                 const Point2D &collisionPoint) {
         CollisionEnter(obj);

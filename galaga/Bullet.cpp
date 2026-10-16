@@ -6,7 +6,8 @@
 #include "MathUtil.h"
 #include "Player.h"
 
-Bullet::Bullet(CMPUT350::Point2D location, CMPUT350::Point2D velocity, bool player, std::weak_ptr<CMPUT350::GameObject> parent)
+Bullet::Bullet(CMPUT350::Point2D location, CMPUT350::Point2D velocity, bool player,
+               std::weak_ptr<CMPUT350::GameObject> parent)
     : location(location), velocity(velocity), isFromPlayer(player), parent(parent) {}
 
 bool Bullet::IsPlayerBullet() { return isFromPlayer; }
@@ -20,8 +21,7 @@ void Bullet::Initialize(CMPUT350::GameContext *context) {
 
     if (IsPlayerBullet()) {
         bulletColor = CMPUT350::Colors::orange;
-    }
-    else {
+    } else {
         bulletColor = CMPUT350::Colors::red;
     }
 }
@@ -32,43 +32,39 @@ void Bullet::Update(CMPUT350::GameContext *context) {
         if (explosionTime <= 0) {
             Kill();
         }
-    }
-    else {
+    } else {
         location += velocity;
     }
-    
+
     if (location.y < 0 || location.y > 1024 || location.x < 0 || location.x > 768) {
         Kill();
     }
 }
 
 void Bullet::LateUpdate(CMPUT350::GameContext *context) {
-    if (parent.expired()) { Kill(); }
+    if (parent.expired()) {
+        Kill();
+    }
 }
 
 void Bullet::RenderBackground(CMPUT350::GameContext *context) {
     if (isExploding) {
-        context->ScreenContext->DrawCircle({}, 15, bulletColor);
-    }
-    else {
+        context->ScreenContext->DrawCircle(explosionPosition, 15, bulletColor);
+    } else {
         context->ScreenContext->DrawLine({}, velocity * -1, 4, bulletColor);
     }
-    
 }
 
-void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) {
+void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj,
+                            const CMPUT350::Point2D &collisionPoint) {
     if ((typeid(*obj) == typeid(Enemy) && IsPlayerBullet()) ||
         typeid(*obj) == typeid(Player) && !IsPlayerBullet()) {
         obj->Kill();
+
+        if (!isExploding || collisionPoint.y > explosionPosition.y) {
+            explosionPosition = collisionPoint;
+        }
         isExploding = true;
-    }
-}
-void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj, const CMPUT350::Point2D &collisionPoint) {
-    if ((typeid(*obj) == typeid(Enemy) && IsPlayerBullet()) ||
-        typeid(*obj) == typeid(Player) && !IsPlayerBullet()) {
-        obj->Kill();
-        isExploding = true;
-        location = collisionPoint;
     }
 }
 

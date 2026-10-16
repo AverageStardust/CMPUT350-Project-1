@@ -308,9 +308,7 @@ Rect Rect::Inseted(int inset) const {
 bool Rect::IsInside(const Point2D &p) const {
     return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
 }
-bool Rect::IsOverlapping(const Rect &rect) const {
-    return (*this & rect).Exists();
-}
+bool Rect::IsOverlapping(const Rect &rect) const { return (*this & rect).Exists(); }
 float Rect::Width() const {
     if (!Exists()) return 0;
     return bottomRight.x - topLeft.x;
@@ -371,7 +369,8 @@ bool Quad::Intersects(const Quad &other, Point2D &point) const {
 }
 
 std::ostream &operator<<(std::ostream &os, const Quad &q) {
-    os << "(" << q.points << ")";
+    os << "(" << q.points[0] << ", " << q.points[1] << ", " << q.points[2] << ", " << q.points[3]
+       << ")";
     return os;
 }
 
@@ -395,14 +394,15 @@ float Matrix2::Determinant() const { return cells[0] * cells[3] - cells[1] * cel
 Matrix2 Matrix2::Inverse() const {
     float determinant = Determinant();
     assert(determinant != 0);
-    return Matrix2(cells[3], -cells[1], -cells[2], cells[0]) * (1 / determinant);
+    return Matrix2(cells[3], -cells[1], -cells[2], cells[0]) * (1.0f / determinant);
 }
 
 Point2D operator*(const Point2D &vector, const Matrix2 &transform) {
-    return vector * transform.Inverse();
+    return transform.Inverse() * vector;
 }
 std::ostream &operator<<(std::ostream &os, const Matrix2 &m) {
-    os << "(" << m.cells << ")";
+    os << "(" << m.cells[0] << ", " << m.cells[1] << ", " << m.cells[2] << ", " << m.cells[3]
+       << ")";
     return os;
 }
 
@@ -447,10 +447,10 @@ Transform2D &operator*=(Transform2D &other, const Transform2D &transform) {
     return other = transform * other;
 }
 Point2D operator*(const Point2D &vector, const Transform2D &transform) {
-    return vector * transform.Inverse();
+    return transform.Inverse() * vector;
 }
 std::ostream &operator<<(std::ostream &os, const Transform2D &t) {
-    os << "(" << t.basis << ", " << t.basis << ")";
+    os << "(" << t.basis << ", " << t.origin << ")";
     return os;
 }
 

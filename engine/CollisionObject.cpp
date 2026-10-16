@@ -27,7 +27,7 @@ void CollisionObject::UpdateCollider() {
 
 // feels like this could be done with meta programming but I can't be damned
 bool Intersects(const Shape &shapeA, const Transform2D &transformA, const Shape &shapeB,
-                const Transform2D &transformB, Point2D point) {
+                const Transform2D &transformB, Point2D& point) {
     switch (shapeA.t) {
         case ShapeType::kLine: {
             Line transformedA = transformA * shapeA.shape.line;

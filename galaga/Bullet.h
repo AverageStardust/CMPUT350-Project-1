@@ -22,7 +22,6 @@ public:
     void RenderBackground(CMPUT350::GameContext* context) override;
 
     // Collision Object Functions
-    void CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject>& obj) override;
     void CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject>& obj, const CMPUT350::Point2D &collisionPoint) override;
 
     const std::vector<CMPUT350::Shape> &GetShapes() override;
@@ -39,8 +38,9 @@ private:
     float boundHeight;
     bool alive = true;
 
-    int explosionTime; // counts down to 0 once activated and then is destroyed
     bool isExploding = false;
+    int explosionTime; // counts down to 0 once activated and then is destroyed
+    CMPUT350::Point2D explosionPosition;
 
     CMPUT350::RGBColor bulletColor = CMPUT350::RGBColor(0, 0, 0);
 };
