@@ -37,29 +37,29 @@ void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
 void InstallKeyDownNotification(int notifKey, const std::string &notification) {
     // Register key with Notification manager for keydown events.
     // NotifKey is the scancode of the key we want to implement.
-    registeredKeys.push_back(notifKey);
-    registeredNotifications.push_back(notification);
+    mRegisteredKeys.push_back(notifKey);
+    mRegisteredNotifications.push_back(notification);
     
 }
 void InstallKeyUpNotification(int notifKey, const std::string &notification) {
     // Register key with Notification manager for keyup events.
     // NotifKey is the scancode of the key we want to implement.
-    registeredKeys.push_back(-notifKey);
-    registeredNotifications.push_back(notification);
+    mRegisteredKeys.push_back(-notifKey);
+    mRegisteredNotifications.push_back(notification);
 }
 
 void CallNotification(int notifKey) {
-    for (int i = 0; i < registeredKeys.size(); ++i) {
-        if (registeredKeys[i] == notifKey) {
-            mNotificationManager->Notify(registeredNotifications[i])
+    for (int i = 0; i < mRegisteredKeys.size(); ++i) {
+        if (mRegisteredKeys[i] == notifKey) {
+            mNotificationManager->Notify(mRegisteredNotifications[i])
             break;
         }
     }
 }
 
 // Iterators
-const_iterator begin() { return mGameObjects.begin(); }
-const_iterator end() { return mGameObjects.end(); }
+EngineView::const_iterator begin() { return mGameObjects.begin(); }
+EngineView::const_iterator end() { return mGameObjects.end(); }
 
 // ----------------------------------------------------------------
 
@@ -135,11 +135,10 @@ void GameEngine::renderObjects(GameContext *context) {
     // Iterate over all GameObjects and render GraphicsObjects to the screen
     // Render objects to the background
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> graphicObj =
-            std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        std::shared_ptr<GraphicsObject> graphicObj = std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
-            context->ScreenContext->SetContextOffset(gObj->getLocation());
-            context->ScreenContext->SetContextRotation(gObj->getRotation());
+            context->ScreenContext->SetContextOffset(graphicObj->getLocation());
+            context->ScreenContext->SetContextRotation(graphicObj->getRotation());
 
             graphicObj->RenderBackground(context);
         }
@@ -147,9 +146,11 @@ void GameEngine::renderObjects(GameContext *context) {
 
     // Render objects to the foreground
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> graphicObj =
-            std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        std::shared_ptr<GraphicsObject> graphicObj = std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
+            context->ScreenContext->SetContextOffset(graphicObj->getLocation());
+            context->ScreenContext->SetContextRotation(graphicObj->getRotation());
+
             graphicObj->RenderForeground(context);
         }
     }
