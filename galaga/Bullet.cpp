@@ -27,16 +27,18 @@ void Bullet::Initialize(CMPUT350::GameContext *context) {
 }
 
 void Bullet::Update(CMPUT350::GameContext *context) {
-    location += velocity;
-
-    if (location.y < 0 || location.y > 1024 || location.x < 0 || location.x > 768) {
-        Kill();
-    }
     if (isExploding) {
         explosionTime -= 1;
         if (explosionTime <= 0) {
             Kill();
         }
+    }
+    else {
+        location += velocity;
+    }
+    
+    if (location.y < 0 || location.y > 1024 || location.x < 0 || location.x > 768) {
+        Kill();
     }
 }
 
