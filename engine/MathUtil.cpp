@@ -1,6 +1,7 @@
 #include "MathUtil.h"
 
-#include <cmath>
+#include <algorithm>
+#include <limits>
 
 namespace CMPUT350 {
 
@@ -48,11 +49,24 @@ Point2D &Point2D::operator/=(const float &scalar) {
     return *this;
 }
 
-Point2D Point2D::Min(Point2D other) const { return Point2D(fmin(x, other.x), fmin(y, other.y)); }
-Point2D Point2D::Max(Point2D other) const { return Point2D(fmax(x, other.x), fmax(y, other.y)); }
+Point2D Point2D::Min(Point2D other) const {
+    return Point2D(std::min(x, other.x), std::min(y, other.y));
+}
+Point2D Point2D::Max(Point2D other) const {
+    return Point2D(std::max(x, other.x), std::max(y, other.y));
+}
+Point2D Point2D::Abs() const { return Point2D(std::abs(x), std::abs(y)); }
+Point2D Point2D::Sign() const { return Point2D((x > 0) ? 1 : -1, (y > 0) ? 1 : -1); }
 float Point2D::Dot(Point2D other) const { return x * other.x + y * other.y; }
 float Point2D::Cross(Point2D other) const { return x * other.y - y * other.x; }
-float Point2D::Distance(const Point2D &other) const { return hypotf(x - other.x, y - other.y); }
+float Point2D::Distance(const Point2D &other) const {
+    return std::hypotf(x - other.x, y - other.y);
+}
+float Point2D::DistanceSq(const Point2D &other) const {
+    float distX = x - other.x;
+    float distY = y - other.y;
+    return distX * distX + distY * distY;
+}
 void Point2D::Normalize() { *this /= this->Length(); }
 Point2D Point2D::Normalized() const { return *this / this->Length(); }
 void Point2D::Rotate(float thetaRadians) {
@@ -86,28 +100,90 @@ Point2D operator*(float scalar, const Point2D &point) {
 float Line::Length() const { return p1.Distance(p2); }
 Point2D Line::ClosestPoint(const Point2D &p) const {
     Point2D diff = p2 - p1;
+
     float t = (p - p1).Dot(diff) / diff.LengthSq();
-    t = fmax(t, fmin(t, 1));  // clamp
+    t = std::clamp(t, 0.0f, 1.0f);  // clamp
+
     return p1 + diff * t;
 }
-bool Line::IsOnLeftSide(const Point2D &p) const { return (p1 - p).Cross(p2 - p) < 0; }
-// bool Line::Intersects(const Line &other, Point2D &point) const {
-//     float determinant = (p2 - p1).Cross(other.p2 - other.p1);
+Point2D Line::Lerp(float t) const { return (p1 + (p2 - p1) * t); }
+bool lineInterectT(const Line &a, const Line &b, float &t) {
+    float determinant = (a.p2 - a.p1).Cross(b.p2 - b.p1);
+    if (determinant == 0) return false;
 
-//     if (determinant == 0)
-//         return false;
+    t = (b.p1 - a.p1).Cross(b.p2 - b.p1) / determinant;
+    if (t < 0 || t > 1) return false;
 
-//     float t = (other.p1 - p1).Cross(other.p2 - other.p1) / determinant;
+    float u = (a.p1 - b.p1).Cross(a.p2 - a.p1) / -determinant;
+    return !(u < 0 || u > 1);
+}
+bool Line::Intersects(const Line &other, Point2D &point) const {
+    float t;
+    bool intersects = lineInterectT(*this, other, t);
 
+    if (intersects) point = Lerp(t);
 
-//     (p1+(p2-p1) * t).Distance(other.p1) /
-//     dist(p1+(p2-p1) * t, P) / |P->|
+    return intersects;
+}
+bool Line::Intersects(const Circle &other, Point2D &point) const {
+    Point2D deepestPoint = ClosestPoint(other.center);
+    float depthSquared = other.radius * other.radius - deepestPoint.DistanceSq(point);
 
-//     return;
-// }
+    if (depthSquared < 0) return false;
+
+    // find entry point from p1
+    point = deepestPoint + std::sqrt(depthSquared) * (p1 - p2).Normalized();
+    return true;
+}
+bool Line::Intersects(const Rect &other, Point2D &point) const {
+    float leastT = std::numeric_limits<float>::infinity();
+    float t;
+
+    if (lineInterectT(*this, Line(other.topLeft, {other.topLeft.x, other.bottomRight.y}), t))
+        leastT = std::min(leastT, t);
+    if (lineInterectT(*this, Line({other.topLeft.x, other.bottomRight.y}, other.bottomRight), t))
+        leastT = std::min(leastT, t);
+    if (lineInterectT(*this, Line(other.bottomRight, {other.bottomRight.x, other.topLeft.y}), t))
+        leastT = std::min(leastT, t);
+    if (lineInterectT(*this, Line({other.bottomRight.x, other.topLeft.y}, other.topLeft), t))
+        leastT = std::min(leastT, t);
+
+    bool intersects = leastT < std::numeric_limits<float>::infinity();
+
+    if (intersects) point = Lerp(leastT);
+
+    return intersects;
+}
 
 std::ostream &operator<<(std::ostream &os, const Line &l) {
     os << "(" << l.p1 << ", " << l.p2 << ")";
+    return os;
+}
+
+bool Circle::Intersects(const Line &other, Point2D &point) const {
+    return other.Intersects(*this, point);
+}
+bool Circle::Intersects(const Circle &other, Point2D &point) const {
+    if (center.Distance(other.center) > radius + other.radius) return false;
+
+    point = (center + other.center) / 2;
+    return true;
+}
+bool Circle::Intersects(const Rect &other, Point2D &point) const {
+    Point2D centerDist = (center - other.Center()).Abs();
+    Point2D edgeDist = centerDist - other.Size() / 2;
+
+    bool intersects = edgeDist.LengthSq() <= radius * radius;
+
+    if (intersects) {
+        point = other.Center() + edgeDist * (center - other.Center()).Sign();
+    }
+
+    return intersects;
+}
+
+std::ostream &operator<<(std::ostream &os, const Circle &l) {
+    os << "(" << l.center << ", " << l.radius << ")";
     return os;
 }
 
@@ -203,13 +279,17 @@ Point2D Rect::Center() const {
     return (bottomRight + topLeft) / 2.0;
 }
 bool Rect::Exists() const { return bottomRight >= topLeft; }
-
+bool Rect::Intersects(const Line &other, Point2D &point) const {
+    return other.Intersects(*this, point);
+}
+bool Rect::Intersects(const Circle &other, Point2D &point) const {
+    return other.Intersects(*this, point);
+}
 bool Rect::Intersects(const Rect &p, Point2D &point) const {
     Rect intersection = *this & p;
     bool intersects = intersection.Exists();
 
-    if (intersects)
-        point = intersection.Center();
+    if (intersects) point = intersection.Center();
 
     return intersects;
 }
@@ -274,15 +354,9 @@ Transform2D Transform2D::operator*(const Transform2D &other) const {
 }
 
 Transform2D Transform2D::Inverse() const { return Transform2D(basis.Inverse(), origin * -1); }
-float Transform2D::Scale() const {
-    return hypotf(basis.cells[0], basis.cells[2]);
-}
-Point2D Transform2D::Translation() const {
-    return origin;
-}
-float Transform2D::Rotation() const {
-    return atan2(basis.cells[2], basis.cells[0]);
-}
+float Transform2D::Scale() const { return std::hypotf(basis.cells[0], basis.cells[2]); }
+Point2D Transform2D::Translation() const { return origin; }
+float Transform2D::Rotation() const { return std::atan2(basis.cells[2], basis.cells[0]); }
 
 std::ostream &operator<<(std::ostream &os, const Transform2D &t) {
     os << "(" << t.basis << ", " << t.basis << ")";
