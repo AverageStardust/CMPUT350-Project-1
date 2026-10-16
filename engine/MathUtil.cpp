@@ -136,21 +136,20 @@ bool Line::Intersects(const Circle &other, Point2D &point) const {
     return true;
 }
 bool Line::Intersects(const Rect &other, Point2D &point) const {
-    float leastT = std::numeric_limits<float>::infinity();
+    return Intersects(Quad(other), point);
+}
+bool Line::Intersects(const Quad &other, Point2D &point) const {
+    float minT = -1;
     float t;
 
-    if (lineInterectT(*this, Line(other.topLeft, {other.topLeft.x, other.bottomRight.y}), t))
-        leastT = std::min(leastT, t);
-    if (lineInterectT(*this, Line({other.topLeft.x, other.bottomRight.y}, other.bottomRight), t))
-        leastT = std::min(leastT, t);
-    if (lineInterectT(*this, Line(other.bottomRight, {other.bottomRight.x, other.topLeft.y}), t))
-        leastT = std::min(leastT, t);
-    if (lineInterectT(*this, Line({other.bottomRight.x, other.topLeft.y}, other.topLeft), t))
-        leastT = std::min(leastT, t);
+    if (lineInterectT(*this, other.Segment(0), t)) minT = std::min(minT, t);
+    if (lineInterectT(*this, other.Segment(1), t)) minT = std::min(minT, t);
+    if (lineInterectT(*this, other.Segment(2), t)) minT = std::min(minT, t);
+    if (lineInterectT(*this, other.Segment(3), t)) minT = std::min(minT, t);
 
-    bool intersects = leastT < std::numeric_limits<float>::infinity();
+    bool intersects = minT != -1;
 
-    if (intersects) point = Lerp(leastT);
+    if (intersects) point = Lerp(minT);
 
     return intersects;
 }
@@ -180,6 +179,44 @@ bool Circle::Intersects(const Rect &other, Point2D &point) const {
     }
 
     return intersects;
+}
+float lineInterectDepthSquared(const Circle &a, const Line &b, Point2D &point) {
+    Point2D deepestPoint = b.ClosestPoint(a.center);
+    float depthSquared = a.radius * a.radius - deepestPoint.DistanceSq(point);
+
+    if (depthSquared < 0) return 0;
+
+    // find entry point from p1
+    point = deepestPoint;
+    return depthSquared;
+}
+bool Circle::Intersects(const Quad &other, Point2D &point) const {
+    float depth;
+    float maxDepth = 0;
+    Point2D candidatePoint;
+
+    depth = lineInterectDepthSquared(*this, other.Segment(0), candidatePoint);
+    if (depth > maxDepth) {
+        point = candidatePoint;
+        maxDepth = depth;
+    }
+    depth = lineInterectDepthSquared(*this, other.Segment(1), candidatePoint);
+    if (depth > maxDepth) {
+        point = candidatePoint;
+        maxDepth = depth;
+    }
+    depth = lineInterectDepthSquared(*this, other.Segment(2), candidatePoint);
+    if (depth > maxDepth) {
+        point = candidatePoint;
+        maxDepth = depth;
+    }
+    depth = lineInterectDepthSquared(*this, other.Segment(3), candidatePoint);
+    if (depth > maxDepth) {
+        point = candidatePoint;
+        maxDepth = depth;
+    }
+
+    return depth > 0;
 }
 
 std::ostream &operator<<(std::ostream &os, const Circle &l) {
@@ -285,17 +322,43 @@ bool Rect::Intersects(const Line &other, Point2D &point) const {
 bool Rect::Intersects(const Circle &other, Point2D &point) const {
     return other.Intersects(*this, point);
 }
-bool Rect::Intersects(const Rect &p, Point2D &point) const {
-    Rect intersection = *this & p;
+bool Rect::Intersects(const Rect &other, Point2D &point) const {
+    Rect intersection = *this & other;
     bool intersects = intersection.Exists();
 
     if (intersects) point = intersection.Center();
 
     return intersects;
 }
+bool Rect::Intersects(const Quad &other, Point2D &point) const {
+    return Quad(*this).Intersects(other, point);
+}
 
 std::ostream &operator<<(std::ostream &os, const Rect &r) {
     os << "(" << r.topLeft << ", " << r.bottomRight << ")";
+    return os;
+}
+
+Line Quad::Segment(int index) const { return Line(points[index], points[(index + 1) % 4]); }
+bool Quad::Intersects(const Line &other, Point2D &point) const {
+    return other.Intersects(*this, point);
+}
+bool Quad::Intersects(const Circle &other, Point2D &point) const {
+    return other.Intersects(*this, point);
+}
+bool Quad::Intersects(const Rect &other, Point2D &point) const {
+    return Quad(other).Intersects(*this, point);
+}
+bool Quad::Intersects(const Quad &other, Point2D &point) const {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (Segment(i).Intersects(Segment(j), point)) break;
+        }
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, const Quad &q) {
+    os << "(" << q.points << ")";
     return os;
 }
 
@@ -342,12 +405,10 @@ Line Transform2D::operator*(const Line &line) const {
 Circle Transform2D::operator*(const Circle &circle) const {
     return Circle(circle.center, circle.radius * Scale());
 }
-Rect Transform2D::operator*(const Rect &rect) const {
-    Point2D p0 = *this * rect.topLeft;
-    Point2D p1 = *this * Point2D(rect.topLeft.x, rect.bottomRight.y);
-    Point2D p2 = *this * rect.bottomRight;
-    Point2D p3 = *this * Point2D(rect.bottomRight.x, rect.topLeft.y);
-    return Rect(p0, p1) | p2 | p3;
+Quad Transform2D::operator*(const Rect &rect) const { return *this * Quad(rect); }
+Quad Transform2D::operator*(const Quad &quad) const {
+    return Quad(*this * quad.points[0], *this * quad.points[1], *this * quad.points[2],
+                *this * quad.points[3]);
 }
 Transform2D Transform2D::operator*(const Transform2D &other) const {
     return Transform2D(basis * other.basis, basis * other.origin + origin);
@@ -359,7 +420,7 @@ Line &operator*=(Line &line, const Transform2D &transform) { return line = trans
 Circle &operator*=(Circle &circle, const Transform2D &transform) {
     return circle = transform * circle;
 }
-Rect &operator*=(Rect &rect, const Transform2D &transform) { return rect = transform * rect; }
+Quad &operator*=(Quad &quad, const Transform2D &transform) { return quad = transform * quad; }
 Transform2D &operator*=(Transform2D &other, const Transform2D &transform) {
     return other = transform * other;
 }

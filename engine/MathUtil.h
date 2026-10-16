@@ -60,6 +60,7 @@ Point2D operator*(float scalar, const Point2D &point);
 
 struct Circle;
 struct Rect;
+struct Quad;
 
 struct Line {
     Point2D p1, p2;
@@ -73,6 +74,7 @@ struct Line {
     bool Intersects(const Line &other, Point2D &point) const;
     bool Intersects(const Circle &other, Point2D &point) const;
     bool Intersects(const Rect &other, Point2D &point) const;
+    bool Intersects(const Quad &other, Point2D &point) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Line &l);
@@ -87,6 +89,7 @@ struct Circle {
     bool Intersects(const Line &other, Point2D &point) const;
     bool Intersects(const Circle &other, Point2D &point) const;
     bool Intersects(const Rect &other, Point2D &point) const;
+    bool Intersects(const Quad &other, Point2D &point) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Circle &l);
@@ -130,9 +133,29 @@ struct Rect {
     bool Intersects(const Line &other, Point2D &point) const;
     bool Intersects(const Circle &other, Point2D &point) const;
     bool Intersects(const Rect &other, Point2D &point) const;
+    bool Intersects(const Quad &other, Point2D &point) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Rect &r);
+
+struct Quad {
+    Point2D points[4];
+
+    Quad(Point2D p1, Point2D p2, Point2D p3, Point2D p4) : points{p1, p2, p3, p4} {}
+    Quad(Rect rect)
+        : points{rect.topLeft,
+                 {rect.topLeft.x, rect.bottomRight.y},
+                 rect.bottomRight,
+                 {rect.bottomRight.x, rect.topLeft.y}} {}
+
+    Line Segment(int index) const;
+    bool Intersects(const Line &other, Point2D &point) const;
+    bool Intersects(const Circle &other, Point2D &point) const;
+    bool Intersects(const Rect &other, Point2D &point) const;
+    bool Intersects(const Quad &other, Point2D &point) const;
+};
+
+std::ostream &operator<<(std::ostream &os, const Quad &q);
 
 // 2x2 matrix
 struct Matrix2 {
@@ -166,7 +189,8 @@ struct Transform2D {
     Point2D operator*(const Point2D &vector) const;
     Line operator*(const Line &line) const;
     Circle operator*(const Circle &circle) const;
-    Rect operator*(const Rect &rect) const;
+    Quad operator*(const Rect &rect) const;
+    Quad operator*(const Quad &rect) const;
     Transform2D operator*(const Transform2D &other) const;
 
     Transform2D Inverse() const;
@@ -178,7 +202,7 @@ struct Transform2D {
 Point2D &operator*=(Point2D &vector, const Transform2D &transform);
 Line &operator*=(Line &line, const Transform2D &transform);
 Circle &operator*=(Circle &circle, const Transform2D &transform);
-Rect &operator*=(Rect &rect, const Transform2D &transform);
+Quad &operator*=(Quad &quad, const Transform2D &transform);
 Transform2D &operator*=(Transform2D &other, const Transform2D &transform);
 std::ostream &operator<<(std::ostream &os, const Transform2D &t);
 
