@@ -20,7 +20,7 @@ public:
     void LateUpdate(CMPUT350::GameContext *context) override;
     bool IsAlive() const override;
     void Kill() override;
-    void ReceiveNotification(const std::string& key) override;
+    void ReceiveNotification(const std::string& notification) override;
 
     // Graphics Object Functions
     void RenderForeground(CMPUT350::GameContext *context) override;

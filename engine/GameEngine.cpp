@@ -4,6 +4,7 @@
 
 #include "CollisionObject.h"
 #include "DrawContext.h"
+#include "NotificationManager.h"
 #include "SFML/Graphics/Font.hpp"
 
 /// @brief
@@ -25,10 +26,9 @@ GameEngine::GameEngine(unsigned int width, unsigned int height, const std::strin
 
 GameEngine::~GameEngine() {
     // Cleanup resources
+    delete mNotificationManager;
     mWindow->close();
 }
-
-
 
 // EngineView functions -------------------------------------------
 
@@ -41,23 +41,21 @@ void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
 void GameEngine::InstallKeyDownNotification(int notifKey, const std::string &notification) {
     // Register key with Notification manager for keydown events.
     // NotifKey is the scancode of the key we want to implement.
-    mRegisteredKeys.push_back(notifKey);
+    mRegisteredKeys.push_back(1 + notifKey);
     mRegisteredNotifications.push_back(notification);
-
 }
 void GameEngine::InstallKeyUpNotification(int notifKey, const std::string &notification) {
     // Register key with Notification manager for keyup events.
     // NotifKey is the scancode of the key we want to implement.
-    mRegisteredKeys.push_back(-notifKey);
+    mRegisteredKeys.push_back(-(1 + notifKey));
     mRegisteredNotifications.push_back(notification);
 }
 
-void GameEngine::CallNotification(int notifKey) {
+void GameEngine::NotifyForInstalledKey(int notifKey) {
     // Tells NotificationManager to notify all GameObjects registered for notifkey
     for (int i = 0; i < mRegisteredKeys.size(); ++i) {
         if (mRegisteredKeys[i] == notifKey) {
             mNotificationManager->Notify(mRegisteredNotifications[i]);
-            break;
         }
     }
 }
@@ -67,8 +65,6 @@ EngineView::const_iterator GameEngine::begin() const { return mGameObjects.begin
 EngineView::const_iterator GameEngine::end() const { return mGameObjects.end(); }
 
 // ----------------------------------------------------------------
-
-
 
 // Engine loop functions ------------------------------------------
 
@@ -83,6 +79,9 @@ void GameEngine::cleanupDeadGameObjects() {
         }
     }
     mGameObjects.swap(filterResult);
+
+    // clean referances to old objects
+    // mNotificationManager->Clean();
 }
 
 bool GameEngine::ProcessEvents(GameContext *context) {
@@ -97,16 +96,16 @@ bool GameEngine::ProcessEvents(GameContext *context) {
             mWindow->setView(sf::View(
                 sf::FloatRect({0.f, 0.f}, {float(resize->size.x), float(resize->size.y)})));
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-            CallNotification(1 + static_cast<int>(keyPressed->scancode));
+            NotifyForInstalledKey(1 + int(keyPressed->scancode));
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyReleased>()) {
-            CallNotification(-1 * (1 + static_cast<int>(keyPressed->scancode)));
+            NotifyForInstalledKey(-1 * (1 + int(keyPressed->scancode)));
         }
     }
 
     return false;
 }
 
-void GameEngine::processCollisions() {                                                              // TODO: Update with new collision checking
+void GameEngine::processCollisions() {  // TODO: Update with new collision checking
     // Check each object against each other object and call CollisionEnter on any objects that
     // intersect
 
@@ -137,22 +136,20 @@ void GameEngine::renderObjects(GameContext *context) {
     // Iterate over all GameObjects and render GraphicsObjects to the screen
     // Render objects to the background
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> graphicObj = std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        std::shared_ptr<GraphicsObject> graphicObj =
+            std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
-            context->ScreenContext->SetContextOffset(graphicObj->GetLocation());
-            context->ScreenContext->SetContextRotation(graphicObj->GetRotation());
-
+            context->CurrObject = gObj->weak_from_this();
             graphicObj->RenderBackground(context);
         }
     }
 
     // Render objects to the foreground
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
-        std::shared_ptr<GraphicsObject> graphicObj = std::dynamic_pointer_cast<GraphicsObject>(gObj);
+        std::shared_ptr<GraphicsObject> graphicObj =
+            std::dynamic_pointer_cast<GraphicsObject>(gObj);
         if (graphicObj != nullptr) {
-            context->ScreenContext->SetContextOffset(graphicObj->GetLocation());
-            context->ScreenContext->SetContextRotation(graphicObj->GetRotation());
-
+            context->CurrObject = gObj->weak_from_this();
             graphicObj->RenderForeground(context);
         }
     }
@@ -169,8 +166,6 @@ void GameEngine::renderObjects(GameContext *context) {
 
 // ----------------------------------------------------------------
 
-
-
 /**
  * @method Run
  * @arguments None
@@ -178,7 +173,8 @@ void GameEngine::renderObjects(GameContext *context) {
  * all objects have been destroyed.
  */
 void GameEngine::Run() {
-    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont), new DrawContext(mWindow, mFont), mNotificationManager);
+    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont),
+                                           new DrawContext(mWindow, mFont), mNotificationManager);
 
     while (true)  // window is open
     {
@@ -188,6 +184,8 @@ void GameEngine::Run() {
         // 1. Activate and initialize any objects added during the last frame
         for (std::shared_ptr<GameObject> gObj : addedGameObjects) {
             mGameObjects.push_back(gObj);
+
+            context->CurrObject = gObj->weak_from_this();
             gObj->Initialize(context);
         }
         addedGameObjects.clear();
@@ -200,6 +198,7 @@ void GameEngine::Run() {
 
         // 3. Update game objects
         for (std::shared_ptr<GameObject> gObj : mGameObjects) {
+            context->CurrObject = gObj->weak_from_this();
             gObj->Update(context);
         }
 
@@ -208,6 +207,7 @@ void GameEngine::Run() {
 
         // 5. Late updates
         for (std::shared_ptr<GameObject> gObj : mGameObjects) {
+            context->CurrObject = gObj->weak_from_this();
             gObj->LateUpdate(context);
         }
 

@@ -21,7 +21,6 @@ namespace CMPUT350 {
 class DrawContext;
 
 class GameEngine : public EngineView {
-
 public:
     GameEngine(unsigned int width, unsigned int height, const std::string &name);
     ~GameEngine();
@@ -34,7 +33,7 @@ public:
     void AddGameObject(std::shared_ptr<GameObject> gameObject) override;
     void InstallKeyDownNotification(int, const std::string &notification) override;
     void InstallKeyUpNotification(int, const std::string &notification) override;
-    void CallNotification(int);
+    void NotifyForInstalledKey(int);
 
     bool ProcessEvents(GameContext *context);
     void cleanupDeadGameObjects();
@@ -50,12 +49,14 @@ private:
     std::shared_ptr<sf::RenderWindow> mWindow;
     std::shared_ptr<sf::Font> mFont;
     std::vector<std::shared_ptr<GameObject>> mGameObjects;
-    std::vector<std::shared_ptr<GameObject>> addedGameObjects;  // Newly added objects that will be activated on the next frame
+    std::vector<std::shared_ptr<GameObject>>
+        addedGameObjects;  // Newly added objects that will be activated on the next frame
 
     // Notification manager (the vectors are mapped to one another)
-    std::shared_ptr<CMPUT350::NotificationManager> mNotificationManager;
-    std::vector<int> mRegisteredKeys; // Positive ints are for keydown events, negative ints are for keyup events
-    std::vector<std::string> mRegisteredNotifications;
+    NotificationManager *mNotificationManager = new NotificationManager();
+    std::vector<int> mRegisteredKeys =
+        {};  // Positive ints are for keydown events, negative ints are for keyup events
+    std::vector<std::string> mRegisteredNotifications = {};
 };
 
 }  // namespace CMPUT350

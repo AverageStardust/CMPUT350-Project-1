@@ -13,13 +13,11 @@ void Player::Initialize(CMPUT350::GameContext *context) {
     mEngineView = context->mEngineView;
 
     // Sign up for key press notifications
-    std::weak_ptr<GameObject> mSelf = weak_from_this();
-    context->mNotificationManager->Register(mSelf, "shoot"      );
-    context->mNotificationManager->Register(mSelf, "shoot_stop" );
-    context->mNotificationManager->Register(mSelf, "move_left"  );
-    context->mNotificationManager->Register(mSelf, "stop_left"  );
-    context->mNotificationManager->Register(mSelf, "move_right" );
-    context->mNotificationManager->Register(mSelf, "stop_right" );
+    context->mNotificationManager->Register(context->CurrObject, "shoot");
+    context->mNotificationManager->Register(context->CurrObject, "move_left");
+    context->mNotificationManager->Register(context->CurrObject, "stop_left");
+    context->mNotificationManager->Register(context->CurrObject, "move_right");
+    context->mNotificationManager->Register(context->CurrObject, "stop_right");
 }
 
 void Player::Update(CMPUT350::GameContext *context) {
@@ -56,15 +54,17 @@ void Player::LateUpdate(CMPUT350::GameContext *context) {}
             break;
     }
 }*/
-void Player::ReceiveNotification(const std::string& key) {
+void Player::ReceiveNotification(const std::string &notification) {
     // Handle key presses
-    if (key == "move_left")       { isLeftPressed  = true; }
-    else if (key == "stop_left")  { isLeftPressed  = false; }
-
-    else if (key == "move_right") { isRightPressed = true; }
-    else if (key == "stop_right") { isRightPressed = false; }
-
-    else if (key == "shoot")      {
+    if (notification == "move_left") {
+        isLeftPressed = true;
+    } else if (notification == "stop_left") {
+        isLeftPressed = false;
+    } else if (notification == "move_right") {
+        isRightPressed = true;
+    } else if (notification == "stop_right") {
+        isRightPressed = false;
+    } else if (notification == "shoot") {
         bullets.remove_if([](std::weak_ptr<Bullet> bullet) { return bullet.expired(); });
         int size = distance(bullets.begin(), bullets.end());  // yuck
 
@@ -75,9 +75,7 @@ void Player::ReceiveNotification(const std::string& key) {
             bullets.push_front(bullet);
         }
     }
-    else if (key == "shoot_stop") {}
 }
-
 
 void Player::RenderForeground(CMPUT350::GameContext *context) {
     context->ScreenContext->DrawLine(location + CMPUT350::Point2D(20, 5),
@@ -102,13 +100,9 @@ void Player::RenderForeground(CMPUT350::GameContext *context) {
 
 void Player::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) {}
 
-void Player::Kill() {
-    alive = false;
-}
+void Player::Kill() { alive = false; }
 
-bool Player::IsAlive() const {
-    return alive;
-}
+bool Player::IsAlive() const { return alive; }
 
 CMPUT350::Point2D Player::GetLocation() const { return location; };
 
