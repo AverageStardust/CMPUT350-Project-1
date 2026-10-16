@@ -9,7 +9,6 @@ class GameEngine;
 #include <memory>
 #include <vector>
 
-#include "CollisionObject.h"
 #include "EngineView.h"
 #include "FontData.h"
 #include "GameContext.h"

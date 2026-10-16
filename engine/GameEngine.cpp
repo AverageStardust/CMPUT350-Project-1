@@ -1,5 +1,9 @@
 #include "GameEngine.h"
+
 #include <memory>
+
+#include "CollisionObject.h"
+#include "DrawContext.h"
 #include "SFML/Graphics/Font.hpp"
 
 /// @brief
@@ -106,10 +110,10 @@ bool GameEngine::ProcessEvents(GameContext *context) {
 }
 
 void GameEngine::processCollisions() {
-    // Check each object against each other object and call CollisionEnter on any objects that intersect
+    // Check each object against each other object and call CollisionEnter on any objects that
+    // intersect
 
     std::vector<std::shared_ptr<CollisionObject>> colliders;
-    std::vector<CMPUT350::Rect> bounds;
 
     for (int i = 0; i < mGameObjects.size(); i++) {
         std::shared_ptr<CollisionObject> collider =
@@ -117,13 +121,14 @@ void GameEngine::processCollisions() {
 
         if (collider != nullptr) {
             colliders.push_back(collider);
-            bounds.push_back(collider->GetBounds());
+            collider->UpdateBounds();
         }
     }
 
     for (int i = 0; i < colliders.size(); i++) {
         for (int j = i + 1; j < colliders.size(); j++) {
-            if (bounds[i].IsIntersecting(bounds[j])) {
+            bool isColliding = colliders[i]->CheckCollision(*colliders[j]);
+            if (isColliding) {
                 colliders[i]->CollisionEnter(colliders[j]);
                 colliders[j]->CollisionEnter(colliders[i]);
             }
@@ -152,6 +157,15 @@ void GameEngine::renderObjects(GameContext *context) {
             context->ScreenContext->SetContextRotation(graphicObj->getRotation());
 
             graphicObj->RenderForeground(context);
+        }
+    }
+
+    // Render colliders
+    for (std::shared_ptr<GameObject> cObj : mGameObjects) {
+        std::shared_ptr<CollisionObject> collisionObj =
+            std::dynamic_pointer_cast<CollisionObject>(cObj);
+        if (collisionObj != nullptr) {
+            context->ScreenContext->FrameRect(collisionObj->bounds, 1, Colors::green);
         }
     }
 }
