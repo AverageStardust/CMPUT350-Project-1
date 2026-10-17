@@ -189,7 +189,9 @@ void GameEngine::Run() {
         CleanupDeadGameObjects();
 
         // 1. Activate and initialize any objects added during the last frame
-        for (std::shared_ptr<GameObject> gObj : addedGameObjects) {
+
+        for (int i = 0; i < addedGameObjects.size(); i++) {
+            auto &gObj = addedGameObjects[i];
             mGameObjects.push_back(gObj);
 
             context->CurrObject = gObj->weak_from_this();

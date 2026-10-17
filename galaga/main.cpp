@@ -8,6 +8,5 @@ int main()
 	engine.AddGameObject(game);
 	engine.Run();
 
-
 	return 0;
 }
