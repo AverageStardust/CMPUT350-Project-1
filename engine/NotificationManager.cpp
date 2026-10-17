@@ -1,5 +1,4 @@
 #include "NotificationManager.h"
-#include <iostream>
 
 namespace CMPUT350 {
 void NotificationManager::Register(std::weak_ptr<GameObject> object,
@@ -43,14 +42,13 @@ void NotificationManager::Clean() {
 
         // loop over objects
         auto& registeredObjects = (*notification).second;
-        auto gameObjectIter = registeredObjects.begin();
-
-        while (gameObjectIter != registeredObjects.end()) {
-            auto gameObject = gameObjectIter++;  // take pre-increment so that it's safe to erase it
+        auto objectIter = registeredObjects.begin();
+        while (objectIter != registeredObjects.end()) {
+            auto object = objectIter++;  // take pre-increment so that it's safe to erase it
 
             // erase if expired
-            if (gameObject->expired()) {
-                registeredObjects.erase(gameObject);
+            if (object->expired()) {
+                registeredObjects.erase(object);
             }
         }
 

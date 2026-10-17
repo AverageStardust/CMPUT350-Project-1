@@ -35,8 +35,10 @@ public:
     void InstallKeyDownNotification(int, const std::string &notification) override;
     void InstallKeyUpNotification(int, const std::string &notification) override;
 
-    void RecordReplay(std::string path) override;
-    void RunReplay(std::string path) override;
+    void WriteReplay(std::string path) override;
+    void ReadReplay(std::string path) override;
+    void FinishWritingReplay() override;
+    void FinishReadingReplay() override;
 
     void PhysicalKeyEvent(int keyCode, bool isDown);
     void HandleReplays(GameContext *context);
@@ -53,7 +55,7 @@ public:
     void Run();
 
 private:
-    GameContext *context;
+    GameContext *context = nullptr;
     std::shared_ptr<sf::RenderWindow> mWindow;
     std::shared_ptr<sf::Font> mFont;
     std::vector<std::shared_ptr<GameObject>> mGameObjects;

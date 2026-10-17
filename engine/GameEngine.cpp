@@ -30,8 +30,8 @@ GameEngine::GameEngine(unsigned int width, unsigned int height, const std::strin
 GameEngine::~GameEngine() {
     // Cleanup resources
     delete mNotificationManager;
-    delete replayOutput;
-    delete replayInput;
+    FinishReadingReplay();
+    FinishWritingReplay();
 
     mWindow->close();
 }
@@ -117,20 +117,36 @@ void GameEngine::NotifyKeyEvent(int keyCode, bool isDown) {
     }
 }
 
-void GameEngine::RecordReplay(std::string path) {
+void GameEngine::WriteReplay(std::string path) {
     if (replayOutput == nullptr) {
         replayOutput = new std::ofstream(path);
         replayOutputTime = 0;
     }
 }
 
-void GameEngine::RunReplay(std::string path) {
+void GameEngine::ReadReplay(std::string path) {
     if (replayInput == nullptr) {
         replayInput = new std::ifstream(path);
 
         if (context != nullptr) {
             context->currentFrame = 0;
         }
+    }
+}
+
+void GameEngine::FinishWritingReplay() {
+    if (replayOutput != nullptr) {
+        replayOutput->close();
+        delete replayOutput;
+        replayOutput = nullptr;
+    }
+}
+
+void GameEngine::FinishReadingReplay() {
+    if (replayInput != nullptr) {
+        replayInput->close();
+        delete replayInput;
+        replayInput = nullptr;
     }
 }
 
