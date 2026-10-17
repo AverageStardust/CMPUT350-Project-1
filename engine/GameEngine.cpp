@@ -1,5 +1,6 @@
 #include "GameEngine.h"
 
+#include <map>
 #include <memory>
 
 #include "CollisionObject.h"
@@ -38,25 +39,26 @@ void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
 }
 
 // Key notifications
-void GameEngine::InstallKeyDownNotification(int notifKey, const std::string &notification) {
+void GameEngine::InstallKeyDownNotification(int keyCode, const std::string &notification) {
     // Register key with Notification manager for keydown events.
     // NotifKey is the scancode of the key we want to implement.
-    mRegisteredKeys.push_back(1 + notifKey);
-    mRegisteredNotifications.push_back(notification);
+    mKeyDownInstalled.insert({keyCode, notification});
 }
-void GameEngine::InstallKeyUpNotification(int notifKey, const std::string &notification) {
+void GameEngine::InstallKeyUpNotification(int keyCode, const std::string &notification) {
     // Register key with Notification manager for keyup events.
     // NotifKey is the scancode of the key we want to implement.
-    mRegisteredKeys.push_back(-(1 + notifKey));
-    mRegisteredNotifications.push_back(notification);
+    mKeyUpInstalled.insert({keyCode, notification});
 }
 
-void GameEngine::NotifyForInstalledKey(int notifKey) {
-    // Tells NotificationManager to notify all GameObjects registered for notifkey
-    for (int i = 0; i < mRegisteredKeys.size(); ++i) {
-        if (mRegisteredKeys[i] == notifKey) {
-            mNotificationManager->Notify(mRegisteredNotifications[i]);
-        }
+void GameEngine::NotifyKeyEvent(int keyCode, bool isDown) {
+    const auto &installedMap = isDown ? mKeyDownInstalled : mKeyUpInstalled;
+
+    auto iter = installedMap.lower_bound(keyCode);
+    auto end = installedMap.upper_bound(keyCode);
+
+    while (iter != end) {
+        if (iter->first == keyCode) mNotificationManager->Notify(iter->second);
+        iter++;
     }
 }
 
@@ -96,9 +98,9 @@ bool GameEngine::ProcessEvents(GameContext *context) {
             mWindow->setView(sf::View(
                 sf::FloatRect({0.f, 0.f}, {float(resize->size.x), float(resize->size.y)})));
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-            NotifyForInstalledKey(1 + int(keyPressed->scancode));
+            NotifyKeyEvent(int(keyPressed->scancode), true);
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyReleased>()) {
-            NotifyForInstalledKey(-1 * (1 + int(keyPressed->scancode)));
+            NotifyKeyEvent(int(keyPressed->scancode), false);
         }
     }
 

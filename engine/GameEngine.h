@@ -6,6 +6,7 @@ namespace CMPUT350 {
 class GameEngine;
 }
 
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -33,7 +34,7 @@ public:
     void AddGameObject(std::shared_ptr<GameObject> gameObject) override;
     void InstallKeyDownNotification(int, const std::string &notification) override;
     void InstallKeyUpNotification(int, const std::string &notification) override;
-    void NotifyForInstalledKey(int);
+    void NotifyKeyEvent(int keyCode, bool isKeyDown);
 
     bool ProcessEvents(GameContext *context);
     void CleanupDeadGameObjects();
@@ -55,9 +56,8 @@ private:
     // Notification manager (the vectors are mapped to one another)
 
     NotificationManager *mNotificationManager = new NotificationManager();
-    std::vector<int> mRegisteredKeys =
-        {};  // Positive ints are for keydown events, negative ints are for keyup events
-    std::vector<std::string> mRegisteredNotifications = {};
+    std::multimap<int, std::string> mKeyDownInstalled = {};
+    std::multimap<int, std::string> mKeyUpInstalled = {};
 };
 
 }  // namespace CMPUT350

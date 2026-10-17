@@ -19,7 +19,7 @@ void Galaga::Initialize(CMPUT350::GameContext *context) {
     view->InstallKeyDownNotification(CMPUT350::Key::D, "move_right");
     view->InstallKeyUpNotification(CMPUT350::Key::D, "stop_right");
     view->InstallKeyDownNotification(CMPUT350::Key::Num1, "start");
-    view->InstallKeyUpNotification(CMPUT350::Key::Num5, "coin");
+    view->InstallKeyDownNotification(CMPUT350::Key::Num5, "coin");
 
     context->mNotificationManager->Register(context->CurrObject, "start");
     context->mNotificationManager->Register(context->CurrObject, "coin");
