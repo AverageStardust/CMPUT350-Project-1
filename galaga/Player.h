@@ -20,7 +20,7 @@ public:
     void LateUpdate(CMPUT350::GameContext *context) override;
     bool IsAlive() const override;
     void Kill() override;
-    void ReceiveNotification(const std::string& notification) override;
+    void ReceiveNotification(const std::string &notification) override;
 
     // Graphics Object Functions
     void RenderForeground(CMPUT350::GameContext *context) override;
@@ -37,13 +37,11 @@ private:
     std::forward_list<std::weak_ptr<Bullet>> bullets;
     bool isLeftPressed = false;
     bool isRightPressed = false;
+    bool isShootPressed = false;
 
     float boundWidth;
     float boundHeight;
     bool alive = true;
-
-    CMPUT350::EngineView *mEngineView;
-    std::weak_ptr<CMPUT350::GameObject> ptrToSelf;
 };
 
 #endif

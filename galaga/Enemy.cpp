@@ -12,7 +12,11 @@ void Enemy::Initialize(CMPUT350::GameContext *context) {
 
 void Enemy::Update(CMPUT350::GameContext *context) {}
 
-void Enemy::LateUpdate(CMPUT350::GameContext *context) {}
+void Enemy::LateUpdate(CMPUT350::GameContext *context) {
+    if (!alive) {
+        context->mNotificationManager->Notify("enemy_died");
+    }
+}
 
 void Enemy::RenderBackground(CMPUT350::GameContext *context) {}
 
@@ -35,9 +39,7 @@ bool Enemy::IsAlive() const { return alive; }
 
 CMPUT350::Point2D Enemy::GetLocation() const { return location; };
 
-float Enemy::GetRotation() const {
-    return 0;
-};
+float Enemy::GetRotation() const { return 0; };
 
 const std::vector<CMPUT350::Shape> &Enemy::GetShapes() {
     static std::vector<CMPUT350::Shape> shapes;

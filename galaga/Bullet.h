@@ -8,13 +8,11 @@
 class Bullet : public CMPUT350::CollisionObject
 {
 public:
-    Bullet(CMPUT350::Point2D location, CMPUT350::Point2D velocity, bool player, std::weak_ptr<CMPUT350::GameObject> parent);
-    bool IsPlayerBullet();
+    Bullet(CMPUT350::Point2D location, CMPUT350::Point2D velocity, bool fromPlayer);
 
     // GameObject Functions
     void Initialize(CMPUT350::GameContext* context) override;
     void Update(CMPUT350::GameContext* context) override;
-    void LateUpdate(CMPUT350::GameContext* context) override;
     bool IsAlive() const override;
     void Kill() override;
 
@@ -31,8 +29,7 @@ public:
 private:
     CMPUT350::Point2D location;
     CMPUT350::Point2D velocity;
-    bool isFromPlayer;
-    std::weak_ptr<CMPUT350::GameObject> parent;
+    const bool isFromPlayer;
 
     float boundWidth;
     float boundHeight;

@@ -5,7 +5,7 @@ namespace CMPUT350 {
 void GameObject::Initialize(GameContext *context) { return; }
 void GameObject::Update(GameContext *context) { return; }
 void GameObject::LateUpdate(GameContext *context) { return; }
-void GameObject::RenderUI(GameContext *contextrender) { return; }
+void GameObject::RenderUI(GameContext *context) { return; }
 bool GameObject::IsAlive() const { return true; }
 void GameObject::Kill() {}
 void GameObject::ReceiveNotification(const std::string& key) {}

@@ -6,11 +6,8 @@
 #include "MathUtil.h"
 #include "Player.h"
 
-Bullet::Bullet(CMPUT350::Point2D location, CMPUT350::Point2D velocity, bool player,
-               std::weak_ptr<CMPUT350::GameObject> parent)
-    : location(location), velocity(velocity), isFromPlayer(player), parent(parent) {}
-
-bool Bullet::IsPlayerBullet() { return isFromPlayer; }
+Bullet::Bullet(CMPUT350::Point2D location, CMPUT350::Point2D velocity, bool isFromPlayer)
+    : location(location), velocity(velocity), isFromPlayer(isFromPlayer) {}
 
 void Bullet::Initialize(CMPUT350::GameContext *context) {
     // Manually setting bound size, change if desired
@@ -19,7 +16,7 @@ void Bullet::Initialize(CMPUT350::GameContext *context) {
 
     explosionTime = 4;
 
-    if (IsPlayerBullet()) {
+    if (isFromPlayer) {
         bulletColor = CMPUT350::Colors::orange;
     } else {
         bulletColor = CMPUT350::Colors::red;
@@ -41,12 +38,6 @@ void Bullet::Update(CMPUT350::GameContext *context) {
     }
 }
 
-void Bullet::LateUpdate(CMPUT350::GameContext *context) {
-    if (parent.expired()) {
-        Kill();
-    }
-}
-
 void Bullet::RenderBackground(CMPUT350::GameContext *context) {
     if (isExploding) {
         context->ScreenContext->DrawCircle(explosionPosition, 15, bulletColor);
@@ -57,8 +48,9 @@ void Bullet::RenderBackground(CMPUT350::GameContext *context) {
 
 void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj,
                             const CMPUT350::Point2D &collisionPoint) {
-    if ((typeid(*obj) == typeid(Enemy) && IsPlayerBullet()) ||
-        typeid(*obj) == typeid(Player) && !IsPlayerBullet()) {
+    bool enemyHit = (typeid(*obj) == typeid(Enemy)) && isFromPlayer;
+    bool playerHit = (typeid(*obj) == typeid(Player)) && !isFromPlayer;
+    if (enemyHit || playerHit) {
         obj->Kill();
 
         if (!isExploding || collisionPoint.y > explosionPosition.y) {
