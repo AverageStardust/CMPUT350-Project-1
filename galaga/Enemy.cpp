@@ -17,9 +17,11 @@ void Enemy::Update(CMPUT350::GameContext *context) {
     if (state == "enter") {
         location = entryPath.GetLocation(curPosition);
         curPosition = entryPath.Increment(speed, curPosition);
+        //mRotation = atan(entryPath.GetSlope(curPosition));
 
         if ( curPosition >= 1) {
             state = "idle";
+            location = entryPath.GetLocation(1.0f);
         }
     }
     else if (state == "idle") {

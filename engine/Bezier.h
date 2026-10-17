@@ -31,6 +31,7 @@ class Path {
         Path(const std::vector<Point2D> &pts, Point2D loc);
 
         void MakePath(const std::vector<Point2D> &pts) {
+            assert((pts.size() % 3) == 1);
             for (int i = 0; i < num_segments; ++i) {
                 bezierList.push_back(Bezier( {pts[3*i], pts[3*i + 1], pts[3*i + 2], pts[3*i + 3]} ));
             }
@@ -39,7 +40,7 @@ class Path {
         Point2D GetLocation(float curLocation) {
             float scaledLocation = curLocation * num_segments;
             int curve = static_cast<int>(scaledLocation);
-            if (curLocation < 1.0f) {
+            if (curve < num_segments) {
                 return bezierList[curve].GetPoint(scaledLocation - curve);
             }
             else {
