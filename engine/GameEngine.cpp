@@ -169,6 +169,12 @@ void GameEngine::RenderObjects(GameContext *context, bool drawColliders) {
             }
         }
     }
+
+    context->ScreenContext->transform = {};
+    for (std::shared_ptr<GameObject> gObj : mGameObjects) {
+        context->CurrObject = gObj->weak_from_this();
+        gObj->RenderUI(context);
+    }
 }
 
 // ----------------------------------------------------------------
