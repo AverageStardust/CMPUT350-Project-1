@@ -14,7 +14,7 @@ void Enemy::Initialize(CMPUT350::GameContext *context) {
     boundWidth = 50.0f;
     boundHeight = 50.0f;
     speed = 10.0f;
-    attackSpeed = 4.0f;
+    attackSpeed = 3.5f;
 
     curPosition = 0.0f;
 }
@@ -65,7 +65,7 @@ bool Enemy::Attack(CMPUT350::GameContext *context, const CMPUT350::Point2D &targ
     std::vector<CMPUT350::Point2D> attackCurve { location/*{384.8, 310.4}*/, {160.5, 118.4}, {266.9, 25.6}, {399.6, 27.2},
     {532.2, 28.8}, {607.5, 449.6}, {604.2, 566.4},
     {591.1, 664}, {327.5, 595.2}, /*{target.x - 180, 732.8}*/{224.3, 732.8},
-    {108.1, 860.8}, {227.6, 974.4}, target/*{371.7, 974.4}*/,
+    {108.1, 860.8}, {227.6, 974.4}, /*target*/{371.7, 974.4},
     {515.8, 974.4}, {655, 899.2}, /*{target.x + 180, 734.4}*/{543.7, 734.4},
     {412.7, 566.4}, {250.5, 681.6}, {170.3, 582.4},
     {73.7, 480}, {178.5, 352}, {383.2, 312} };
