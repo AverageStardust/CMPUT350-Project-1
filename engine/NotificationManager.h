@@ -20,7 +20,7 @@ private:
     std::unordered_map<std::string, std::set<std::weak_ptr<GameObject>, std::owner_less<>>> mListeners = {};
     void Clean();
 
-    //friend class GameEngine;
+    friend class GameEngine;
 };
 
 }  // namespace CMPUT350

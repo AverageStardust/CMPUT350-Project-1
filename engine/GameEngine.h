@@ -34,6 +34,12 @@ public:
     void AddGameObject(std::shared_ptr<GameObject> gameObject) override;
     void InstallKeyDownNotification(int, const std::string &notification) override;
     void InstallKeyUpNotification(int, const std::string &notification) override;
+
+    void RecordReplay(std::string path) override;
+    void RunReplay(std::string path) override;
+
+    void PhysicalKeyEvent(int keyCode, bool isDown);
+    void HandleReplays(GameContext *context);
     void NotifyKeyEvent(int keyCode, bool isKeyDown);
 
     bool ProcessEvents(GameContext *context);
@@ -47,6 +53,7 @@ public:
     void Run();
 
 private:
+    GameContext *context;
     std::shared_ptr<sf::RenderWindow> mWindow;
     std::shared_ptr<sf::Font> mFont;
     std::vector<std::shared_ptr<GameObject>> mGameObjects;
@@ -58,6 +65,10 @@ private:
     NotificationManager *mNotificationManager = new NotificationManager();
     std::multimap<int, std::string> mKeyDownInstalled = {};
     std::multimap<int, std::string> mKeyUpInstalled = {};
+
+    std::ofstream *replayOutput = nullptr;
+    std::ifstream *replayInput = nullptr;
+    int replayOutputTime = 0;
 };
 
 }  // namespace CMPUT350

@@ -17,6 +17,9 @@ class EngineView {
         virtual void InstallKeyDownNotification(int, const std::string &notification) = 0;
         virtual void InstallKeyUpNotification(int, const std::string &notification) = 0;
 
+        virtual void RecordReplay(std::string path) = 0;
+        virtual void RunReplay(std::string path) = 0;
+
         using const_iterator = tGameObject::const_iterator;
         virtual const_iterator begin() const = 0;
         virtual const_iterator end() const = 0;
