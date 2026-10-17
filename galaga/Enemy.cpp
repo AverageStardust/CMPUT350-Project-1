@@ -42,6 +42,7 @@ void Enemy::Update(CMPUT350::GameContext *context) {
             std::shared_ptr<Bullet> bullet =
                 std::make_shared<Bullet>(location, CMPUT350::Point2D(0, 20), false);
             context->mEngineView->AddGameObject(bullet);
+            state = "idle";
         }
     }
 }
