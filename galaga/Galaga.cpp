@@ -123,7 +123,7 @@ void Galaga::Attack(CMPUT350::GameContext *context, int attackers) {
                 skipOverNEnemiesInAttack--;
 
                 if (skipOverNEnemiesInAttack <= 0) {
-                    skipOverNEnemiesInAttack = 13;
+                    skipOverNEnemiesInAttack = 27;
 
                     if (enemy->Attack(context, player->GetLocation())) {
                         attackerCount++;
@@ -213,7 +213,7 @@ void Galaga::StartGame(CMPUT350::GameContext *context) {
     playerRespawnCooldown = 10;
     attackCooldown = 360;
     skipOverNEnemiesInAttack = 3;
-    attackersPerAttack = 4;
+    attackersPerAttack = 3;
 
     level = 1;
     score = 0;

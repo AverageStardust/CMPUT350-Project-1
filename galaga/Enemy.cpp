@@ -42,9 +42,9 @@ void Enemy::Update(CMPUT350::GameContext *context) {
         mRotation = lerpAngle(mRotation, targetRotation, 0.03);
     }
     else if (state == "attack") {
-        if (context->currentFrame % 30 == 0) {
+        if (context->currentFrame % 35 == 0 && location.y < 600) {
             std::shared_ptr<Bullet> bullet =
-                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, 20), false);
+                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, 15), false);
             context->mEngineView->AddGameObject(bullet);
         }
 

@@ -41,7 +41,7 @@ private:
     // spawn&play data
     int playerRespawnCooldown = -1;
     int attackCooldown = 0;
-    int attackersPerAttack = 4;
+    int attackersPerAttack = 0;
     int skipOverNEnemiesInAttack = 0;
     int enemiesLeft = 0;
     int level = 0;
