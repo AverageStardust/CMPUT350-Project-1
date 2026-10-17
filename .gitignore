@@ -77,3 +77,5 @@ cmake-build-*/
 .DS_Store
 build/
 .clangd
+
+replay.txt

@@ -1,7 +1,9 @@
 #include "GameEngine.h"
 
+#include <fstream>
 #include <map>
 #include <memory>
+#include <string>
 
 #include "CollisionObject.h"
 #include "DrawContext.h"
@@ -28,6 +30,9 @@ GameEngine::GameEngine(unsigned int width, unsigned int height, const std::strin
 GameEngine::~GameEngine() {
     // Cleanup resources
     delete mNotificationManager;
+    FinishReadingReplay();
+    FinishWritingReplay();
+
     mWindow->close();
 }
 
@@ -50,6 +55,56 @@ void GameEngine::InstallKeyUpNotification(int keyCode, const std::string &notifi
     mKeyUpInstalled.insert({keyCode, notification});
 }
 
+void GameEngine::PhysicalKeyEvent(int keyCode, bool isDown) {
+    if (replayInput == nullptr) {
+        NotifyKeyEvent(keyCode, isDown);
+    }
+
+    if (replayOutput != nullptr) {
+        // frame keyCode isDown
+        *replayOutput << std::to_string(replayOutputTime) << " " << std::to_string(keyCode)
+                      << " " << std::to_string(isDown) << "\n";
+    }
+}
+
+void GameEngine::HandleReplays(GameContext *context) {
+    if (replayInput != nullptr) {
+        while (true) {
+            std::string line;
+            auto lineStartPosition = replayInput->tellg();
+
+            // read line
+            if (!std::getline(*replayInput, line)) goto closeFile;
+
+            // split line
+            std::stringstream lineStream(line);
+            std::string frameStr, keyCodeStr, isDownStr;
+            if (!(lineStream >> frameStr)) goto closeFile;
+            if (!(lineStream >> keyCodeStr)) goto closeFile;
+            if (!(lineStream >> isDownStr)) goto closeFile;
+
+            int frame = stoi(frameStr);
+
+            // check position
+            if (frame > context->currentFrame) {
+                replayInput->seekg(lineStartPosition);
+                return;
+            }
+
+            int keyCode = stoi(keyCodeStr);
+            bool isDown = stoi(isDownStr);
+            NotifyKeyEvent(keyCode, isDown);
+        }
+
+    closeFile:
+        delete replayInput;
+        replayInput = nullptr;
+        return;
+    }
+
+    replayOutputTime++;
+}
+
 void GameEngine::NotifyKeyEvent(int keyCode, bool isDown) {
     const auto &installedMap = isDown ? mKeyDownInstalled : mKeyUpInstalled;
 
@@ -59,6 +114,39 @@ void GameEngine::NotifyKeyEvent(int keyCode, bool isDown) {
     while (iter != end) {
         if (iter->first == keyCode) mNotificationManager->Notify(iter->second);
         iter++;
+    }
+}
+
+void GameEngine::WriteReplay(std::string path) {
+    if (replayOutput == nullptr) {
+        replayOutput = new std::ofstream(path);
+        replayOutputTime = 0;
+    }
+}
+
+void GameEngine::ReadReplay(std::string path) {
+    if (replayInput == nullptr) {
+        replayInput = new std::ifstream(path);
+
+        if (context != nullptr) {
+            context->currentFrame = 0;
+        }
+    }
+}
+
+void GameEngine::FinishWritingReplay() {
+    if (replayOutput != nullptr) {
+        replayOutput->close();
+        delete replayOutput;
+        replayOutput = nullptr;
+    }
+}
+
+void GameEngine::FinishReadingReplay() {
+    if (replayInput != nullptr) {
+        replayInput->close();
+        delete replayInput;
+        replayInput = nullptr;
     }
 }
 
@@ -83,7 +171,7 @@ void GameEngine::CleanupDeadGameObjects() {
     mGameObjects.swap(filterResult);
 
     // clean referances to old objects
-    // mNotificationManager->Clean();
+    mNotificationManager->Clean();
 }
 
 bool GameEngine::ProcessEvents(GameContext *context) {
@@ -98,11 +186,13 @@ bool GameEngine::ProcessEvents(GameContext *context) {
             mWindow->setView(sf::View(
                 sf::FloatRect({0.f, 0.f}, {float(resize->size.x), float(resize->size.y)})));
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-            NotifyKeyEvent(int(keyPressed->scancode), true);
+            PhysicalKeyEvent(int(keyPressed->scancode), true);
         } else if (const auto *keyPressed = event->getIf<sf::Event::KeyReleased>()) {
-            NotifyKeyEvent(int(keyPressed->scancode), false);
+            PhysicalKeyEvent(int(keyPressed->scancode), false);
         }
     }
+
+    HandleReplays(context);
 
     return false;
 }
@@ -189,8 +279,8 @@ void GameEngine::RenderObjects(GameContext *context, bool drawColliders) {
  * all objects have been destroyed.
  */
 void GameEngine::Run() {
-    GameContext *context = new GameContext(this, new DrawContext(mWindow, mFont),
-                                           new DrawContext(mWindow, mFont), mNotificationManager);
+    context = new GameContext(this, new DrawContext(mWindow, mFont),
+                              new DrawContext(mWindow, mFont), mNotificationManager);
 
     while (true)  // window is open
     {
@@ -249,6 +339,7 @@ void GameEngine::Run() {
 
     delete context->ScreenContext;
     delete context;
+    context = nullptr;
 }
 
 }  // namespace CMPUT350

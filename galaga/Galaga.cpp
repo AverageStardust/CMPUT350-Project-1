@@ -1,6 +1,8 @@
 #include "Galaga.h"
 
 #include <cassert>
+#include <iostream>
+#include <vector>
 
 #include "DrawContext.h"
 #include "Enemy.h"
@@ -10,18 +12,13 @@
 #include "Player.h"
 #include "Stars.h"
 
-#include <vector>
-#include <iostream>
-
-
 // Define enemy curves
-std::vector<CMPUT350::Point2D> ENEMY_ENTRY_LEFT = { {562, 0}, {612, 125}, {146, 291}, {82, 402},
-                    {18, 512}, {87, 582}, {156, 602}, {224, 621}, {326, 538}, {357, 475} };
-
-
+std::vector<CMPUT350::Point2D> ENEMY_ENTRY_LEFT = {{562, 0},   {612, 125}, {146, 291}, {82, 402},
+                                                   {18, 512},  {87, 582},  {156, 602}, {224, 621},
+                                                   {326, 538}, {357, 475}};
 
 void Galaga::Initialize(CMPUT350::GameContext *context) {
-    auto view = context->mEngineView;
+    view = context->mEngineView;
 
     // Install key events
     view->InstallKeyDownNotification(CMPUT350::Key::Space, "shoot");
@@ -31,32 +28,25 @@ void Galaga::Initialize(CMPUT350::GameContext *context) {
     view->InstallKeyUpNotification(CMPUT350::Key::D, "stop_right");
     view->InstallKeyDownNotification(CMPUT350::Key::Num1, "start");
     view->InstallKeyDownNotification(CMPUT350::Key::Num5, "coin");
+    view->InstallKeyDownNotification(CMPUT350::Key::Num9, "write_replay");
+    view->InstallKeyDownNotification(CMPUT350::Key::Num0, "read_replay");
 
     context->mNotificationManager->Register(context->CurrObject, "start");
     context->mNotificationManager->Register(context->CurrObject, "coin");
     context->mNotificationManager->Register(context->CurrObject, "enemy_died");
-
+    context->mNotificationManager->Register(context->CurrObject, "write_replay");
+    context->mNotificationManager->Register(context->CurrObject, "read_replay");
 
     view->AddGameObject(std::make_shared<Stars>(250, CMPUT350::Rect(0, 0, 768, 1024)));
-
-    auto player = std::make_shared<Player>(CMPUT350::Point2D(int(768 / 2), 900));
-    view->AddGameObject(player);
-
-
-    // Initialize enemies
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 10; x++) {
-            auto enemy = std::make_shared<Enemy>(CMPUT350::Point2D(40 + x * 76, 76 + y * 76), ENEMY_ENTRY_LEFT);
-            view->AddGameObject(enemy);
-            std::cout << "Added Enemy\n";
-        }
-    }
 };
 
 void Galaga::Update(CMPUT350::GameContext *context) {
+    view = context->mEngineView;
+
     switch (state) {
         case GalagaState::wait:
             if (startingNextFrame) {
+                startingNextFrame = false;
                 StartGame(context);
             }
             break;
@@ -66,9 +56,8 @@ void Galaga::Update(CMPUT350::GameContext *context) {
             if (spawnCooldown <= 0) {
                 auto enemy = std::make_shared<Enemy>(
                     CMPUT350::Point2D(80 + 87 * waveEnemiesSpawned, 80 + wavesSpawned * 87),
-                    ENEMY_ENTRY_LEFT
-                );
-                context->mEngineView->AddGameObject(enemy);
+                    ENEMY_ENTRY_LEFT);
+                view->AddGameObject(enemy);
 
                 waveEnemiesSpawned++;
                 spawnCooldown = 8;
@@ -94,7 +83,7 @@ void Galaga::Update(CMPUT350::GameContext *context) {
             playerRespawnCooldown--;
             if (playerRespawnCooldown == 0) {
                 auto player = std::make_shared<Player>(CMPUT350::Point2D(int(768 / 2), 900));
-                context->mEngineView->AddGameObject(player);
+                view->AddGameObject(player);
             }
 
             break;
@@ -152,7 +141,6 @@ void Galaga::ReceiveNotification(const std::string &key) {
     if (key == "coin") {
         cointsInserted++;
     } else if (key == "start" && state == GalagaState::wait && cointsInserted > 0) {
-        cointsInserted--;
         startingNextFrame = true;
     } else if (key == "enemy_died") {
         enemiesLeft--;
@@ -162,12 +150,19 @@ void Galaga::ReceiveNotification(const std::string &key) {
         if (lives > 0) {
             playerRespawnCooldown = 40;
         }
+    } else if (key == "write_replay") {
+        view->WriteReplay("./replay.txt");
+    } else if (key == "read_replay") {
+        view->FinishWritingReplay();
+        view->ReadReplay("./replay.txt");
     }
 }
 
 bool Galaga::IsAlive() const { return alive; };
 
 void Galaga::StartGame(CMPUT350::GameContext *context) {
+    cointsInserted--;
+
     state = GalagaState::spawn;
     spawnCooldown = 30;
     waveEnemiesSpawned = 0;

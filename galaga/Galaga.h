@@ -1,6 +1,7 @@
 #ifndef GALAGA_H
 #define GALAGA_H
 
+#include "EngineView.h"
 #include "GameObject.h"
 #include "MathUtil.h"
 
@@ -19,6 +20,7 @@ public:
     void Kill() override {};
 
 private:
+    CMPUT350::EngineView* view;
     CMPUT350::Point2D windowSize;
     bool alive = true;
 

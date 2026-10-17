@@ -36,25 +36,25 @@ void NotificationManager::Notify(const std::string &notification) {
 
 void NotificationManager::Clean() {
     // loop over notification sets
-    auto i = mListeners.begin();
-    while (i != mListeners.end()) {
-        auto currentI = i++;  // take pre-increment so that it's safe to erase it
+    auto notificationIter = mListeners.begin();
+    while (notificationIter != mListeners.end()) {
+        auto notification = notificationIter++;  // take pre-increment so that it's safe to erase it
 
         // loop over objects
-        auto registeredObjects = (*i).second;
-        auto j = (*i).second.begin();
-        while (j != registeredObjects.end()) {
-            auto currentJ = j++;  // take pre-increment so that it's safe to erase it
+        auto& registeredObjects = (*notification).second;
+        auto objectIter = registeredObjects.begin();
+        while (objectIter != registeredObjects.end()) {
+            auto object = objectIter++;  // take pre-increment so that it's safe to erase it
 
             // erase if expired
-            if (currentJ->expired()) {
-                registeredObjects.erase(currentJ);
+            if (object->expired()) {
+                registeredObjects.erase(object);
             }
         }
 
         // erase if empty
         if (registeredObjects.empty()) {
-            mListeners.erase(currentI);
+            mListeners.erase(notification);
         }
     }
 }

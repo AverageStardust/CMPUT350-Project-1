@@ -66,6 +66,7 @@ float Point2D::DistanceSq(const Point2D &other) const {
     float distY = y - other.y;
     return distX * distX + distY * distY;
 }
+float Point2D::Angle() const { return std::atan2(y, x); }
 void Point2D::Normalize() { *this /= this->Length(); }
 Point2D Point2D::Normalized() const { return *this / this->Length(); }
 void Point2D::Rotate(float thetaRadians) {

@@ -37,6 +37,7 @@ private:
     float mRotation;
 
     std::string state = "enter"; // Valid states: enter, idle, attack
+    CMPUT350::Point2D attackTarget;
 
     float boundWidth;
     float boundHeight;
