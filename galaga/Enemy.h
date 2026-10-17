@@ -47,6 +47,7 @@ private:
     CMPUT350::Path entryPath;
     CMPUT350::Point2D homeLocation;
     float speed;
+    float attackSpeed;
     float curPosition;
 
 };
