@@ -29,7 +29,7 @@ public:
     float GetRotation() const override;
 
     // Attack
-    virtual bool Attack(CMPUT350::GameContext *context, const CMPUT350::Point2D &target) /*= 0*/;
+    bool Attack(CMPUT350::GameContext *context, const CMPUT350::Point2D &target);
 
 private:
     // Private variablesS
@@ -37,6 +37,7 @@ private:
     float mRotation;
 
     std::string state = "enter"; // Valid states: enter, idle, attack
+    CMPUT350::Point2D attackTarget;
 
     float boundWidth;
     float boundHeight;
