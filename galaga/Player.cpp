@@ -31,7 +31,7 @@ void Player::Update(CMPUT350::GameContext *context) {
 
         if (size < 2) {
             std::shared_ptr<Bullet> bullet =
-                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -20), true);
+                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -30), true);
             context->mEngineView->AddGameObject(bullet);
             bullets.push_front(bullet);
         }

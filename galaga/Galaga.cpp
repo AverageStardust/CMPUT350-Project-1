@@ -34,6 +34,7 @@ void Galaga::Initialize(CMPUT350::GameContext *context) {
     context->mNotificationManager->Register(context->CurrObject, "start");
     context->mNotificationManager->Register(context->CurrObject, "coin");
     context->mNotificationManager->Register(context->CurrObject, "enemy_died");
+    context->mNotificationManager->Register(context->CurrObject, "player_died");
     context->mNotificationManager->Register(context->CurrObject, "write_replay");
     context->mNotificationManager->Register(context->CurrObject, "read_replay");
 
@@ -89,7 +90,8 @@ void Galaga::Update(CMPUT350::GameContext *context) {
 
             attackCooldown--;
             if (attackCooldown <= 0) {
-                attackCooldown = 360;
+                attackCooldown = 240;
+                Attack(context, attackersPerAttack);
             }
 
             break;
@@ -119,7 +121,7 @@ void Galaga::Attack(CMPUT350::GameContext *context, int attackers) {
                 skipOverNEnemiesInAttack--;
 
                 if (skipOverNEnemiesInAttack <= 0) {
-                    skipOverNEnemiesInAttack = 7;
+                    skipOverNEnemiesInAttack = 13;
 
                     if (enemy->Attack(context, player->GetLocation())) {
                         attackerCount++;
@@ -205,8 +207,9 @@ void Galaga::StartGame(CMPUT350::GameContext *context) {
     wavesSpawned = 0;
     enemiesLeft = 40;
     playerRespawnCooldown = 10;
-    attackCooldown = 600;
+    attackCooldown = 360;
     skipOverNEnemiesInAttack = 3;
+    attackersPerAttack = 4;
 
     level = 1;
     score = 0;
@@ -221,14 +224,23 @@ void Galaga::NextLevel() {
     waveEnemiesSpawned = 0;
     wavesSpawned = 0;
     enemiesLeft = 40;
-    attackCooldown = 600;
+    attackCooldown = 360;
+    attackersPerAttack++;
 
     level++;
 }
 
 void Galaga::FinishGame(CMPUT350::GameContext *context) {
     state = GalagaState::over;
-    gameOverCooldown = 120;
+    gameOverCooldown = 180;
+
+    for (auto iter = view->begin(); iter < view->end(); iter++) {
+        std::shared_ptr<Enemy> enemy = std::dynamic_pointer_cast<Enemy>(*iter);
+
+        if (enemy != nullptr) {
+            enemy->Kill();
+        }
+    }
 }
 
 void Galaga::RestartGame() {
