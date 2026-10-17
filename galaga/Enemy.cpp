@@ -1,8 +1,11 @@
 #include "Enemy.h"
 
+#include <cmath>
+
 #include "DrawContext.h"
 
-Enemy::Enemy(CMPUT350::Point2D loc, const std::vector<CMPUT350::Point2D> &path) : homeLocation(loc), entryPath(CMPUT350::Path(path, loc)) {}
+Enemy::Enemy(CMPUT350::Point2D loc, const std::vector<CMPUT350::Point2D> &path)
+    : homeLocation(loc), entryPath(CMPUT350::Path(path, loc)) {}
 
 void Enemy::Initialize(CMPUT350::GameContext *context) {
     // Manually setting bound size, change if desired
@@ -13,19 +16,26 @@ void Enemy::Initialize(CMPUT350::GameContext *context) {
     curPosition = 0.0f;
 }
 
+// code from user151496 at https://stackoverflow.com/a/14498790
+float lerpAngle(float start, float end, float amount) {
+    float shortestAngle =
+        std::fmod(((std::fmod(end - start, M_PI * 2)) + (M_PI * 3)), (M_PI * 2)) - M_PI;
+    return start + shortestAngle * amount;
+}
+
 void Enemy::Update(CMPUT350::GameContext *context) {
     if (state == "enter") {
         location = entryPath.GetLocation(curPosition);
         curPosition = entryPath.Increment(speed, curPosition);
-        //mRotation = atan(entryPath.GetSlope(curPosition));
+        mRotation = entryPath.GetSlope(curPosition).Angle() + M_PI_2;
 
-        if ( curPosition >= 1) {
+        if (curPosition >= 1) {
             state = "idle";
             location = entryPath.GetLocation(1.0f);
         }
-    }
-    else if (state == "idle") {
-        
+    } else if (state == "idle") {
+        float targetRotation = std::sin(context->currentFrame * 0.05);
+        mRotation = lerpAngle(mRotation, targetRotation, 0.03);
     }
 }
 
@@ -56,9 +66,7 @@ bool Enemy::IsAlive() const { return alive; }
 
 CMPUT350::Point2D Enemy::GetLocation() const { return location; };
 
-float Enemy::GetRotation() const {
-    return mRotation;
-};
+float Enemy::GetRotation() const { return mRotation; };
 
 const std::vector<CMPUT350::Shape> &Enemy::GetShapes() {
     static std::vector<CMPUT350::Shape> shapes;
@@ -68,6 +76,5 @@ const std::vector<CMPUT350::Shape> &Enemy::GetShapes() {
 
     return shapes;
 }
-
 
 bool Enemy::Attack(CMPUT350::GameContext *context, const CMPUT350::Point2D &target) { return true; }

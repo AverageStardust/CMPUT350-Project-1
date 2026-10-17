@@ -55,13 +55,31 @@ During the **Over** state the player can see their score, it transitions back to
 
 ## Contributions
 
-- Wren Durbano
+Wren
+- Galiga class / game loop
+- Implement MathUtil
+- Implement Transfrom2D
+- Implement DrawContext
+- Implement Player
+- Design Player sprite
+- Font rendering
+- Implement Bezier
+- Update CollisionObject
+- Update GraphicsObject
+- Update GameObject
+- Implement 1b collision logic in GameEngine
 
-Stuff
-
-- Liam Latham
-
-Stuff
+Liam
+- Implement most of GameEngine
+- Implement Enemy
+- Design Enemy sprite
+- Implement Bullet
+- Implement Bezier path following
+- Implement EngineView
+- Implement NotificationManager
+- Update Player
+- Update Bullet
+- Update Enemy
 
 ## Extra Credit
 ### Game Replays
@@ -89,6 +107,9 @@ Replays are formatted as a series of lines, each containing a frame number, a sc
 156 40 0
 162 26 0
 ```
+
+## Credits
+Lerp angle function from user151496 at https://stackoverflow.com/a/14498790
 
 ## AI Usage
 We did not use AI.

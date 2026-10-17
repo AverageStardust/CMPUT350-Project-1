@@ -40,6 +40,7 @@ struct Point2D {
     float Cross(Point2D other) const;
     float Distance(const Point2D &other) const;
     float DistanceSq(const Point2D &other) const;
+    float Angle() const;
     void Normalize();
     Point2D Normalized() const;
     void Rotate(float thetaRadians);
