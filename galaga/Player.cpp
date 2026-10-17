@@ -10,15 +10,12 @@ void Player::Initialize(CMPUT350::GameContext *context) {
     boundWidth = 40.0f;
     boundHeight = 40.0f;
 
-    mEngineView = context->mEngineView;
-    ptrToSelf = context->CurrObject;
-
     // Sign up for key press notifications
-    context->mNotificationManager->Register(ptrToSelf, "shoot");
-    context->mNotificationManager->Register(ptrToSelf, "move_left");
-    context->mNotificationManager->Register(ptrToSelf, "stop_left");
-    context->mNotificationManager->Register(ptrToSelf, "move_right");
-    context->mNotificationManager->Register(ptrToSelf, "stop_right");
+    context->mNotificationManager->Register(context->CurrObject, "shoot");
+    context->mNotificationManager->Register(context->CurrObject, "move_left");
+    context->mNotificationManager->Register(context->CurrObject, "stop_left");
+    context->mNotificationManager->Register(context->CurrObject, "move_right");
+    context->mNotificationManager->Register(context->CurrObject, "stop_right");
 }
 
 void Player::Update(CMPUT350::GameContext *context) {
@@ -27,34 +24,27 @@ void Player::Update(CMPUT350::GameContext *context) {
     } else if (isRightPressed && !isLeftPressed) {
         location.x += 5;
     }
+
+    if (isShootPressed) {
+        bullets.remove_if([](std::weak_ptr<Bullet> bullet) { return bullet.expired(); });
+        int size = distance(bullets.begin(), bullets.end());  // yuck
+
+        if (size < 2) {
+            std::shared_ptr<Bullet> bullet =
+                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -20), true);
+            context->mEngineView->AddGameObject(bullet);
+            bullets.push_front(bullet);
+        }
+        isShootPressed = false;
+    }
 }
 
-void Player::LateUpdate(CMPUT350::GameContext *context) {}
-
-/*void Player::HandleKeyEvent(CMPUT350::GameContext *context, int key, bool isPressed) {
-    switch (key) {
-        case CMPUT350::Key::A:
-            isLeftPressed = isPressed;
-            break;
-        case CMPUT350::Key::D:
-            isRightPressed = isPressed;
-            break;
-        case CMPUT350::Key::Space:
-            if (isPressed) {
-                bullets.remove_if([](std::weak_ptr<Bullet> bullet) { return bullet.expired(); });
-                int size = distance(bullets.begin(), bullets.end());  // yuck
-
-                if (size < 2) {
-                    std::shared_ptr<Bullet> bullet =
-                        std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -20), true);
-                    context->mEngineView->AddGameObject(bullet);
-                    bullets.push_front(bullet);
-                }
-            }
-
-            break;
+void Player::LateUpdate(CMPUT350::GameContext *context) {
+    if (!alive) {
+        context->mNotificationManager->Notify("player_died");
     }
-}*/
+}
+
 void Player::ReceiveNotification(const std::string &notification) {
     // Handle key presses
     if (notification == "move_left") {
@@ -66,15 +56,7 @@ void Player::ReceiveNotification(const std::string &notification) {
     } else if (notification == "stop_right") {
         isRightPressed = false;
     } else if (notification == "shoot") {
-        bullets.remove_if([](std::weak_ptr<Bullet> bullet) { return bullet.expired(); });
-        int size = distance(bullets.begin(), bullets.end());  // yuck
-
-        if (size < 2) {
-            std::shared_ptr<Bullet> bullet =
-                std::make_shared<Bullet>(location, CMPUT350::Point2D(0, -20), true, ptrToSelf);
-            mEngineView->AddGameObject(bullet);
-            bullets.push_front(bullet);
-        }
+        isShootPressed = true;
     }
 }
 
@@ -97,7 +79,15 @@ void Player::RenderForeground(CMPUT350::GameContext *context) {
 
 void Player::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &obj) {}
 
-void Player::Kill() { alive = false; }
+void Player::Kill() {
+    alive = false;
+
+    for (auto bullet : bullets) {
+        auto lock = bullet.lock();
+
+        if (lock != nullptr) lock->Kill();
+    }
+}
 
 bool Player::IsAlive() const { return alive; }
 

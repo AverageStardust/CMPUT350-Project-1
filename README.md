@@ -1,7 +1,16 @@
 # CMPUT 350 HW 1
 
-Team:
--Wren Durbano
--Liam Latham
+## Team
+- Wren Durbano
+- Liam Latham
 
+
+describing your game and the implementation.
+File provides an overview of what you have implemented, including any important design decisions or changes to the basic API.
+Describe the basic game state flow in your Galaga class.
+Document contributions of each of the team member.
+If you have done any of the extra credit, describe the extra credit item and how you implemented it.
+
+
+## AI Usage
 We did not use AI.

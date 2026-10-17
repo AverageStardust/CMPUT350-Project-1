@@ -29,7 +29,11 @@ void Enemy::Update(CMPUT350::GameContext *context) {
     }
 }
 
-void Enemy::LateUpdate(CMPUT350::GameContext *context) {}
+void Enemy::LateUpdate(CMPUT350::GameContext *context) {
+    if (!alive) {
+        context->mNotificationManager->Notify("enemy_died");
+    }
+}
 
 void Enemy::RenderBackground(CMPUT350::GameContext *context) {}
 
