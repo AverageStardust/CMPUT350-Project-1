@@ -4,6 +4,7 @@
 
 #include "Bullet.h"
 #include "DrawContext.h"
+#include "MathUtil.h"
 
 Enemy::Enemy(CMPUT350::Point2D loc, const std::vector<CMPUT350::Point2D> &path)
     : homeLocation(loc), entryPath(CMPUT350::Path(path, loc)) {}
@@ -44,6 +45,9 @@ void Enemy::Update(CMPUT350::GameContext *context) {
             std::shared_ptr<Bullet> bullet =
                 std::make_shared<Bullet>(location, CMPUT350::Point2D(0, 20), false);
             context->mEngineView->AddGameObject(bullet);
+
+            // MAKES IDLE AFTER FIRST SHOT, REMOVE ME LATER
+            state = "idle";
         }
 
         location = entryPath.GetLocation(curPosition);

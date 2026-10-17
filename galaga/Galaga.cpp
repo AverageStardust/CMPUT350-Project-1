@@ -34,6 +34,7 @@ void Galaga::Initialize(CMPUT350::GameContext *context) {
     context->mNotificationManager->Register(context->CurrObject, "start");
     context->mNotificationManager->Register(context->CurrObject, "coin");
     context->mNotificationManager->Register(context->CurrObject, "enemy_died");
+    context->mNotificationManager->Register(context->CurrObject, "player_died");
     context->mNotificationManager->Register(context->CurrObject, "write_replay");
     context->mNotificationManager->Register(context->CurrObject, "read_replay");
 
@@ -83,7 +84,14 @@ void Galaga::Update(CMPUT350::GameContext *context) {
             playerRespawnCooldown--;
             if (playerRespawnCooldown == 0) {
                 auto player = std::make_shared<Player>(CMPUT350::Point2D(int(768 / 2), 900));
+                mPlayer = player->weak_from_this();
                 view->AddGameObject(player);
+            }
+
+            attackCooldown--;
+            if (attackCooldown <= 0) {
+                attackCooldown = 240;
+                Attack(context, attackersPerAttack);
             }
 
             break;
@@ -92,6 +100,36 @@ void Galaga::Update(CMPUT350::GameContext *context) {
             gameOverCooldown--;
             if (gameOverCooldown <= 0) RestartGame();
             break;
+    }
+}
+
+void Galaga::Attack(CMPUT350::GameContext *context, int attackers) {
+    if (attackers <= 0) return;
+
+    auto playerObject = mPlayer.lock();
+    if (playerObject == nullptr) return;
+
+    auto player = std::dynamic_pointer_cast<Player>(playerObject);
+    if (player == nullptr) return;
+
+    int attackerCount = 0;
+    for (int i = 0; i < 100; i++) {  // limit how many times we can try
+        for (auto iter = view->begin(); iter < view->end(); iter++) {
+            std::shared_ptr<Enemy> enemy = std::dynamic_pointer_cast<Enemy>(*iter);
+
+            if (enemy != nullptr) {
+                skipOverNEnemiesInAttack--;
+
+                if (skipOverNEnemiesInAttack <= 0) {
+                    skipOverNEnemiesInAttack = 13;
+
+                    if (enemy->Attack(context, player->GetLocation())) {
+                        attackerCount++;
+                        if (attackerCount >= attackers) return;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -168,14 +206,14 @@ void Galaga::StartGame(CMPUT350::GameContext *context) {
     waveEnemiesSpawned = 0;
     wavesSpawned = 0;
     enemiesLeft = 40;
-    playerRespawnCooldown = -1;
+    playerRespawnCooldown = 10;
+    attackCooldown = 360;
+    skipOverNEnemiesInAttack = 3;
+    attackersPerAttack = 4;
 
     level = 1;
     score = 0;
     lives = 3;
-
-    auto player = std::make_shared<Player>(CMPUT350::Point2D(int(768 / 2), 900));
-    context->mEngineView->AddGameObject(player);
 }
 
 void Galaga::FinishSpawning() { state = GalagaState::play; }
@@ -186,13 +224,23 @@ void Galaga::NextLevel() {
     waveEnemiesSpawned = 0;
     wavesSpawned = 0;
     enemiesLeft = 40;
+    attackCooldown = 360;
+    attackersPerAttack++;
 
     level++;
 }
 
 void Galaga::FinishGame(CMPUT350::GameContext *context) {
     state = GalagaState::over;
-    gameOverCooldown = 120;
+    gameOverCooldown = 180;
+
+    for (auto iter = view->begin(); iter < view->end(); iter++) {
+        std::shared_ptr<Enemy> enemy = std::dynamic_pointer_cast<Enemy>(*iter);
+
+        if (enemy != nullptr) {
+            enemy->Kill();
+        }
+    }
 }
 
 void Galaga::RestartGame() {

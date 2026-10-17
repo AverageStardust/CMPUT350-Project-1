@@ -1,9 +1,11 @@
 #ifndef GALAGA_H
 #define GALAGA_H
 
+#include <memory>
 #include "EngineView.h"
 #include "GameObject.h"
 #include "MathUtil.h"
+#include "Player.h"
 
 enum class GalagaState { wait, spawn, play, over };
 
@@ -22,6 +24,7 @@ public:
 private:
     CMPUT350::EngineView* view;
     CMPUT350::Point2D windowSize;
+    std::weak_ptr<CMPUT350::GameObject> mPlayer;
     bool alive = true;
 
     GalagaState state = GalagaState::wait;
@@ -37,6 +40,9 @@ private:
 
     // spawn&play data
     int playerRespawnCooldown = -1;
+    int attackCooldown = 0;
+    int attackersPerAttack = 4;
+    int skipOverNEnemiesInAttack = 0;
     int enemiesLeft = 0;
     int level = 0;
     int lives = 0;
@@ -53,5 +59,6 @@ private:
     void NextLevel();
     void FinishGame(CMPUT350::GameContext *context);
     void RestartGame();
+    void Attack(CMPUT350::GameContext *context, int attackers);
 };
 #endif  // GALAGA_H
