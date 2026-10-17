@@ -59,7 +59,17 @@ void Galaga::Update(CMPUT350::GameContext *context) {
 
             // fallthrough
         case GalagaState::play:
-            if (enemiesLeft == 0) NextLevel();
+            if (enemiesLeft == 0)
+                NextLevel();
+            else if (lives == 0)
+                FinishGame(context);
+
+            playerRespawnCooldown--;
+            if (playerRespawnCooldown == 0) {
+                auto player = std::make_shared<Player>(CMPUT350::Point2D(int(768 / 2), 900));
+                context->mEngineView->AddGameObject(player);
+            }
+
             break;
 
         case GalagaState::over:
@@ -75,36 +85,35 @@ void Galaga::RenderUI(CMPUT350::GameContext *context) {
     switch (state) {
         case GalagaState::wait:
             if (cointsInserted > 0) {
-                context->ScreenContext->DrawCenteredText(
-                    "Press Start", 32, (windowSize / 2) - CMPUT350::Point2D(0, 32),
-                    CMPUT350::Colors::cyan);
+                context->GUIContext->DrawCenteredText("Press Start", 32,
+                                                      (windowSize / 2) - CMPUT350::Point2D(0, 32),
+                                                      CMPUT350::Colors::cyan);
             } else {
-                context->ScreenContext->DrawCenteredText("Insert Coins", 32,
-                                                         windowSize / 2 - CMPUT350::Point2D(0, 32),
-                                                         CMPUT350::Colors::cyan);
+                context->GUIContext->DrawCenteredText("Insert Coins", 32,
+                                                      windowSize / 2 - CMPUT350::Point2D(0, 32),
+                                                      CMPUT350::Colors::cyan);
             }
-            context->ScreenContext->DrawCenteredText("Coins: " + std::to_string(cointsInserted), 32,
-                                                     windowSize / 2 + CMPUT350::Point2D(0, 32),
-                                                     CMPUT350::Colors::cyan);
+            context->GUIContext->DrawCenteredText("Coins: " + std::to_string(cointsInserted), 32,
+                                                  windowSize / 2 + CMPUT350::Point2D(0, 32),
+                                                  CMPUT350::Colors::cyan);
             break;
 
         case GalagaState::spawn:
         case GalagaState::play:
-            context->ScreenContext->DrawText("Level: " + std::to_string(level), 20, {16, 16},
-                                             CMPUT350::Colors::cyan);
-            context->ScreenContext->DrawText("Lives: " + std::to_string(lives), 20,
-                                             {windowSize.x / 3 + 16, 16}, CMPUT350::Colors::cyan);
-            context->ScreenContext->DrawText("Score: " + std::to_string(score), 20,
-                                             {windowSize.x / 3 * 2 + 16, 16},
-                                             CMPUT350::Colors::cyan);
+            context->GUIContext->DrawText("Level: " + std::to_string(level), 20, {16, 16},
+                                          CMPUT350::Colors::cyan);
+            context->GUIContext->DrawText("Lives: " + std::to_string(lives), 20,
+                                          {windowSize.x / 3 + 16, 16}, CMPUT350::Colors::cyan);
+            context->GUIContext->DrawText("Score: " + std::to_string(score), 20,
+                                          {windowSize.x / 3 * 2 + 16, 16}, CMPUT350::Colors::cyan);
             break;
 
         case GalagaState::over:
-            context->ScreenContext->DrawCenteredText(
+            context->GUIContext->DrawCenteredText(
                 "Game Over", 32, windowSize / 2 - CMPUT350::Point2D(0, 32), CMPUT350::Colors::cyan);
-            context->ScreenContext->DrawCenteredText("Final Score: " + std::to_string(score), 32,
-                                                     windowSize / 2 + CMPUT350::Point2D(0, 32),
-                                                     CMPUT350::Colors::cyan);
+            context->GUIContext->DrawCenteredText("Final Score: " + std::to_string(score), 32,
+                                                  windowSize / 2 + CMPUT350::Point2D(0, 32),
+                                                  CMPUT350::Colors::cyan);
 
             gameOverCooldown--;
             if (gameOverCooldown == 0) RestartGame();
@@ -121,6 +130,11 @@ void Galaga::ReceiveNotification(const std::string &key) {
     } else if (key == "enemy_died") {
         enemiesLeft--;
         score += 5;
+    } else if (key == "player_died") {
+        lives--;
+        if (lives > 0) {
+            playerRespawnCooldown = 40;
+        }
     }
 }
 
@@ -132,6 +146,7 @@ void Galaga::StartGame(CMPUT350::GameContext *context) {
     waveEnemiesSpawned = 0;
     wavesSpawned = 0;
     enemiesLeft = 40;
+    playerRespawnCooldown = -1;
 
     level = 1;
     score = 0;

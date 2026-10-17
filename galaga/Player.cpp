@@ -39,7 +39,11 @@ void Player::Update(CMPUT350::GameContext *context) {
     }
 }
 
-void Player::LateUpdate(CMPUT350::GameContext *context) {}
+void Player::LateUpdate(CMPUT350::GameContext *context) {
+    if (!alive) {
+        context->mNotificationManager->Notify("player_died");
+    }
+}
 
 void Player::ReceiveNotification(const std::string &notification) {
     // Handle key presses

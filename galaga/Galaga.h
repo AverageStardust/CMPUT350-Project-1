@@ -34,6 +34,7 @@ private:
     int wavesSpawned = 0;
 
     // spawn&play data
+    int playerRespawnCooldown = -1;
     int enemiesLeft = 0;
     int level = 0;
     int lives = 0;
