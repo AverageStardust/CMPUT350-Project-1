@@ -59,7 +59,7 @@ void Bullet::CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject> &ob
                             const CMPUT350::Point2D &collisionPoint) {
     if ((typeid(*obj) == typeid(Enemy) && IsPlayerBullet()) ||
         typeid(*obj) == typeid(Player) && !IsPlayerBullet()) {
-        obj->Kill();
+        if (!isExploding) { obj->Kill(); }
 
         if (!isExploding || collisionPoint.y > explosionPosition.y) {
             explosionPosition = collisionPoint;
