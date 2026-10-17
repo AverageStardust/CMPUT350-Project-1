@@ -1,6 +1,8 @@
 #include "Galaga.h"
 
 #include <cassert>
+#include <iostream>
+#include <vector>
 
 #include "DrawContext.h"
 #include "Enemy.h"
@@ -10,9 +12,15 @@
 #include "Player.h"
 #include "Stars.h"
 
+// Define enemy curves
+std::vector<CMPUT350::Point2D> ENEMY_ENTRY_LEFT = {{562, 0},   {612, 125}, {146, 291}, {82, 402},
+                                                   {18, 512},  {87, 582},  {156, 602}, {224, 621},
+                                                   {326, 538}, {357, 475}};
+
 void Galaga::Initialize(CMPUT350::GameContext *context) {
     view = context->mEngineView;
 
+    // Install key events
     view->InstallKeyDownNotification(CMPUT350::Key::Space, "shoot");
     view->InstallKeyDownNotification(CMPUT350::Key::A, "move_left");
     view->InstallKeyUpNotification(CMPUT350::Key::A, "stop_left");
@@ -30,14 +38,14 @@ void Galaga::Initialize(CMPUT350::GameContext *context) {
     context->mNotificationManager->Register(context->CurrObject, "read_replay");
 
     view->AddGameObject(std::make_shared<Stars>(250, CMPUT350::Rect(0, 0, 768, 1024)));
-}
+};
 
 void Galaga::Update(CMPUT350::GameContext *context) {
     view = context->mEngineView;
 
     switch (state) {
         case GalagaState::wait:
-            if(startingNextFrame) {
+            if (startingNextFrame) {
                 startingNextFrame = false;
                 StartGame(context);
             }
@@ -47,7 +55,8 @@ void Galaga::Update(CMPUT350::GameContext *context) {
             spawnCooldown--;
             if (spawnCooldown <= 0) {
                 auto enemy = std::make_shared<Enemy>(
-                    CMPUT350::Point2D(80 + 87 * waveEnemiesSpawned, 80 + wavesSpawned * 87));
+                    CMPUT350::Point2D(80 + 87 * waveEnemiesSpawned, 80 + wavesSpawned * 87),
+                    ENEMY_ENTRY_LEFT);
                 view->AddGameObject(enemy);
 
                 waveEnemiesSpawned++;
