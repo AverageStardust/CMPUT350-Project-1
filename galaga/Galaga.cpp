@@ -13,6 +13,13 @@
 #include <vector>
 #include <iostream>
 
+
+// Define enemy curves
+std::vector<CMPUT350::Point2D> ENEMY_ENTRY_LEFT = { {562, 0}, {612, 125}, {146, 291}, {82, 402},
+                    {18, 512}, {87, 582}, {156, 602}, {224, 621}, {326, 538}, {357, 475} };
+
+
+
 void Galaga::Initialize(CMPUT350::GameContext *context) {
     auto view = context->mEngineView;
 
@@ -36,15 +43,10 @@ void Galaga::Initialize(CMPUT350::GameContext *context) {
     view->AddGameObject(player);
 
 
-    // Define enemy curve
-    std::vector<CMPUT350::Point2D> enemyEntry = { {562, 0}, {612, 125}, {146, 291}, {82, 402},
-                    {18, 512}, {87, 582}, {156, 602}, {224, 621}, {326, 538}, {357, 475} };
-
-
     // Initialize enemies
     for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 10; x++) {
-            auto enemy = std::make_shared<Enemy>(CMPUT350::Point2D(40 + x * 76, 76 + y * 76), enemyEntry);
+            auto enemy = std::make_shared<Enemy>(CMPUT350::Point2D(40 + x * 76, 76 + y * 76), ENEMY_ENTRY_LEFT);
             view->AddGameObject(enemy);
             std::cout << "Added Enemy\n";
         }
@@ -63,7 +65,9 @@ void Galaga::Update(CMPUT350::GameContext *context) {
             spawnCooldown--;
             if (spawnCooldown <= 0) {
                 auto enemy = std::make_shared<Enemy>(
-                    CMPUT350::Point2D(80 + 87 * waveEnemiesSpawned, 80 + wavesSpawned * 87));
+                    CMPUT350::Point2D(80 + 87 * waveEnemiesSpawned, 80 + wavesSpawned * 87),
+                    ENEMY_ENTRY_LEFT
+                );
                 context->mEngineView->AddGameObject(enemy);
 
                 waveEnemiesSpawned++;
