@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <iostream>
 
 namespace CMPUT350 {
 Bezier::Bezier(const Point2D (&&points)[4]) { std::copy(points, points + 4, this->points); }
@@ -25,9 +26,19 @@ Point2D Bezier::GetSlope(const Point2D (&points)[4], float t) {
 }
 
 
-Path::Path(std::vector<Point2D> &pts) : pointList(pts) {
-    MakePath(pts);
+Path::Path(const std::vector<Point2D> &pts) : pointList(pts) {
+    MakePath(pointList);
     num_segments = (pts.size() - 1) / 3;
+}
+
+Path::Path(const std::vector<Point2D> &pts, Point2D loc) : pointList(pts) {
+    std::cout << "path created\n";
+    pointList[pointList.size() - 1] = loc;
+    std::cout << "point changed\n";
+    MakePath(pointList);
+    std::cout << "made path\n";
+    num_segments = (pts.size() - 1) / 3;
+    std::cout << "num_segments calculated\n";
 }
 
 }  // namespace CMPUT350

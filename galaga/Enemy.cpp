@@ -2,15 +2,30 @@
 
 #include "DrawContext.h"
 
-Enemy::Enemy(CMPUT350::Point2D loc) : location(loc) {}
+Enemy::Enemy(CMPUT350::Point2D loc, const std::vector<CMPUT350::Point2D> &path) : homeLocation(loc), entryPath(CMPUT350::Path(path, loc)) {}
 
 void Enemy::Initialize(CMPUT350::GameContext *context) {
     // Manually setting bound size, change if desired
     boundWidth = 50.0f;
     boundHeight = 50.0f;
+    speed = 10.0f;
+
+    curPosition = 0.0f;
 }
 
-void Enemy::Update(CMPUT350::GameContext *context) {}
+void Enemy::Update(CMPUT350::GameContext *context) {
+    if (state == "enter") {
+        location = entryPath.GetLocation(curPosition);
+        curPosition = entryPath.Increment(speed, curPosition);
+
+        if ( curPosition >= 1) {
+            state = "idle";
+        }
+    }
+    else if (state == "idle") {
+        
+    }
+}
 
 void Enemy::LateUpdate(CMPUT350::GameContext *context) {}
 
@@ -36,7 +51,7 @@ bool Enemy::IsAlive() const { return alive; }
 CMPUT350::Point2D Enemy::GetLocation() const { return location; };
 
 float Enemy::GetRotation() const {
-    return 0;
+    return mRotation;
 };
 
 const std::vector<CMPUT350::Shape> &Enemy::GetShapes() {
@@ -47,3 +62,6 @@ const std::vector<CMPUT350::Shape> &Enemy::GetShapes() {
 
     return shapes;
 }
+
+
+bool Enemy::Attack(CMPUT350::GameContext *context, const CMPUT350::Point2D &target) { return true; }

@@ -26,22 +26,35 @@ class Path {
         int num_segments;
 
     public:
-        Path(std::vector<Point2D> &pts);
+        Path(const std::vector<Point2D> &pts);
 
-        void MakePath(std::vector<Point2D> &pts) {
-            for (int i = 0; i < (num_segments / 3); ++i) {
+        Path(const std::vector<Point2D> &pts, Point2D loc);
+
+        void MakePath(const std::vector<Point2D> &pts) {
+            for (int i = 0; i < num_segments; ++i) {
                 bezierList.push_back(Bezier( {pts[3*i], pts[3*i + 1], pts[3*i + 2], pts[3*i + 3]} ));
             }
         }
 
-        Point2D GetPosition(float stepAmount, float curLocation) {
-            int curve = curLocation * num_segments;
-            if (curve >= num_segments) {
+        Point2D GetLocation(float curLocation) {
+            float scaledLocation = curLocation * num_segments;
+            int curve = static_cast<int>(scaledLocation);
+            if (curLocation < 1.0f) {
+                return bezierList[curve].GetPoint(scaledLocation - curve);
+            }
+            else {
                 return bezierList[bezierList.size() - 1].GetPoint(1.0f);
             }
+        }
+
+        float Increment(float stepAmount, float curLocation) {
+            // Returns the incremented location on the curve
+            int curve = curLocation * num_segments;
+            if (curve >= num_segments) {
+                return 1.0f;
+            }
             float locationOnCurve = (curLocation * num_segments) - curve;
-            float newLocation = stepAmount / bezierList[curve].GetSlope(locationOnCurve).Length();
-            return bezierList[curve].GetPoint(newLocation);
+            return stepAmount / bezierList[curve].GetSlope(locationOnCurve).Length() + curLocation;
         }
         
 };
