@@ -40,6 +40,7 @@ public:
     void DrawText(const std::string &text, int pixelSize, Point2D p, RGBColor c);
     void DrawCenteredText(const std::string &text, int pixelSize, Point2D p, RGBColor c);
     void DrawCircle(Point2D p, float radius, RGBColor c);
+    void FrameCircle(Point2D p, float radius, float width, RGBColor c);
     void DrawRect(Rect r, RGBColor c);
     void FrameRect(Rect r, float width, RGBColor c);
     void DrawLine(Point2D from, Point2D to, float width, RGBColor c);

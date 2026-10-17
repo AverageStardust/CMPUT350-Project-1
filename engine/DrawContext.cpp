@@ -51,6 +51,20 @@ void DrawContext::DrawCircle(Point2D p, float radius, RGBColor c) {
     mWindow->draw(circle);
 }
 
+void DrawContext::FrameCircle(Point2D p, float radius, float width, RGBColor c) {
+    p *= transform;
+    radius *= transform.Scale();
+
+    sf::CircleShape circle(radius);
+
+    circle.setPosition((p - radius).AsSfmlVector());
+    circle.setFillColor(sf::Color::Transparent);
+    circle.setOutlineColor(c.AsSfmlColor());
+    circle.setOutlineThickness(1);
+
+    mWindow->draw(circle);
+}
+
 void DrawContext::DrawRect(Rect r, RGBColor c) {
     sf::RectangleShape rect((r.Size() * transform.Scale()).AsSfmlVector());
 

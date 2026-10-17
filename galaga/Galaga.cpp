@@ -28,6 +28,7 @@ void Galaga::Initialize(CMPUT350::GameContext *context) {
     view->InstallKeyUpNotification(CMPUT350::Key::D, "stop_right");
     view->InstallKeyDownNotification(CMPUT350::Key::Num1, "start");
     view->InstallKeyDownNotification(CMPUT350::Key::Num5, "coin");
+    view->InstallKeyDownNotification(CMPUT350::Key::Num8, "toggle_debug");
     view->InstallKeyDownNotification(CMPUT350::Key::Num9, "write_replay");
     view->InstallKeyDownNotification(CMPUT350::Key::Num0, "read_replay");
 
@@ -35,6 +36,7 @@ void Galaga::Initialize(CMPUT350::GameContext *context) {
     context->mNotificationManager->Register(context->CurrObject, "coin");
     context->mNotificationManager->Register(context->CurrObject, "enemy_died");
     context->mNotificationManager->Register(context->CurrObject, "player_died");
+    context->mNotificationManager->Register(context->CurrObject, "toggle_debug");
     context->mNotificationManager->Register(context->CurrObject, "write_replay");
     context->mNotificationManager->Register(context->CurrObject, "read_replay");
 
@@ -188,7 +190,9 @@ void Galaga::ReceiveNotification(const std::string &key) {
         if (lives > 0) {
             playerRespawnCooldown = 40;
         }
-    } else if (key == "write_replay") {
+    } else if (key == "toggle_debug") {
+        view->ToggleDebug();
+    }else if (key == "write_replay") {
         view->WriteReplay("./replay.txt");
     } else if (key == "read_replay") {
         view->FinishWritingReplay();

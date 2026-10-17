@@ -62,8 +62,8 @@ void GameEngine::PhysicalKeyEvent(int keyCode, bool isDown) {
 
     if (replayOutput != nullptr) {
         // frame keyCode isDown
-        *replayOutput << std::to_string(replayOutputTime) << " " << std::to_string(keyCode)
-                      << " " << std::to_string(isDown) << "\n";
+        *replayOutput << std::to_string(replayOutputTime) << " " << std::to_string(keyCode) << " "
+                      << std::to_string(isDown) << "\n";
     }
 }
 
@@ -150,6 +150,8 @@ void GameEngine::FinishReadingReplay() {
     }
 }
 
+void GameEngine::ToggleDebug() { drawColliders = !drawColliders; }
+
 // Iterators
 EngineView::const_iterator GameEngine::begin() const { return mGameObjects.begin(); }
 EngineView::const_iterator GameEngine::end() const { return mGameObjects.end(); }
@@ -226,7 +228,7 @@ void GameEngine::ProcessCollisions() {
     }
 }
 
-void GameEngine::RenderObjects(GameContext *context, bool drawColliders) {
+void GameEngine::RenderObjects(GameContext *context) {
     // Iterate over all GameObjects and render GraphicsObjects to the screen
     // Render objects to the background
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
@@ -250,20 +252,38 @@ void GameEngine::RenderObjects(GameContext *context, bool drawColliders) {
         }
     }
 
+    context->GUIContext->transform = {};
     if (drawColliders) {
         // Render colliders
         for (std::shared_ptr<GameObject> gObj : mGameObjects) {
             std::shared_ptr<CollisionObject> collisionObj =
                 std::dynamic_pointer_cast<CollisionObject>(gObj);
             if (collisionObj != nullptr) {
-                context->ScreenContext->transform = collisionObj->GetTransform();
-                context->ScreenContext->FrameRect(collisionObj->bounds, 1, Colors::green);
+                context->GUIContext->FrameRect(collisionObj->bounds, 1, Colors::green);
+                for (Shape shape : collisionObj->shapes) {
+                    switch (shape.t) {
+                        case ShapeType::kLine: {
+                            Line line = collisionObj->transform * shape.shape.line;
+                            context->GUIContext->DrawLine(line.p1, line.p2, 1, Colors::blue);
+                        } break;
+                        case ShapeType::kCircle: {
+                            Circle circle = collisionObj->transform * shape.shape.circle;
+                            context->GUIContext->FrameCircle(circle.center, circle.radius, 1, Colors::blue);
+                        } break;
+                        case ShapeType::kRect: {
+                            Quad quad = collisionObj->transform * shape.shape.rect;
+                            context->GUIContext->DrawLine(quad.points[0], quad.points[1], 1, Colors::blue);
+                            context->GUIContext->DrawLine(quad.points[1], quad.points[2], 1, Colors::blue);
+                            context->GUIContext->DrawLine(quad.points[2], quad.points[3], 1, Colors::blue);
+                            context->GUIContext->DrawLine(quad.points[3], quad.points[0], 1, Colors::blue);
+                        } break;
+                    }
+                }
             }
         }
     }
 
     context->ScreenContext->transform = {};
-    context->GUIContext->transform = {};
     for (std::shared_ptr<GameObject> gObj : mGameObjects) {
         context->CurrObject = gObj->weak_from_this();
         gObj->RenderUI(context);
@@ -330,7 +350,7 @@ void GameEngine::Run() {
 
         // 6. Render background
         // 7. Render foreground
-        RenderObjects(context, false);
+        RenderObjects(context);
 
         // Actually render to window
         mWindow->display();
