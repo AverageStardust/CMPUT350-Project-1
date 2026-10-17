@@ -29,7 +29,7 @@ public:
     float GetRotation() const override;
 
     // Attack
-    bool Attack(CMPUT350::GameContext *context, const CMPUT350::Point2D &target) override;
+    bool Attack(CMPUT350::GameContext *context, const CMPUT350::Point2D &target);
 
 private:
     // Private variablesS
