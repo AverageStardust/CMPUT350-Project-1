@@ -7,8 +7,8 @@
 Player::Player(CMPUT350::Point2D location) : location(location) {}
 
 void Player::Initialize(CMPUT350::GameContext *context) {
-    boundWidth = 40.0f;
-    boundHeight = 40.0f;
+    boundWidth = 50.0f;
+    boundHeight = 30.0f;
 
     // Sign up for key press notifications
     context->mNotificationManager->Register(context->CurrObject, "shoot");

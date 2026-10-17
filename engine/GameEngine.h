@@ -40,6 +40,8 @@ public:
     void FinishWritingReplay() override;
     void FinishReadingReplay() override;
 
+    void ToggleDebug() override;
+
     void PhysicalKeyEvent(int keyCode, bool isDown);
     void HandleReplays(GameContext *context);
     void NotifyKeyEvent(int keyCode, bool isKeyDown);
@@ -47,7 +49,7 @@ public:
     bool ProcessEvents(GameContext *context);
     void CleanupDeadGameObjects();
     void ProcessCollisions();
-    void RenderObjects(GameContext *context, bool drawColliders);
+    void RenderObjects(GameContext *context);
 
     const_iterator begin() const override;
     const_iterator end() const override;
@@ -71,6 +73,8 @@ private:
     std::ofstream *replayOutput = nullptr;
     std::ifstream *replayInput = nullptr;
     int replayOutputTime = 0;
+
+    bool drawColliders = false;
 };
 
 }  // namespace CMPUT350

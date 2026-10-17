@@ -22,6 +22,8 @@ class EngineView {
         virtual void FinishWritingReplay() = 0;
         virtual void FinishReadingReplay() = 0;
 
+        virtual void ToggleDebug() = 0;
+
         using const_iterator = tGameObject::const_iterator;
         virtual const_iterator begin() const = 0;
         virtual const_iterator end() const = 0;
