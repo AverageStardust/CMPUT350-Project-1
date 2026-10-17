@@ -5,6 +5,16 @@
 - Wren Durbano
 - Liam Latham
 
+## Controls
+
+Move: A, D
+Shoot: Space
+Play: 1
+Insert Coin: 5
+Toggle colliders: 8
+Record replay: 9
+Run replay: 0
+
 ## Implementation
 ### MathUtils
 
